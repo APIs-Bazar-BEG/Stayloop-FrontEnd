@@ -1,3 +1,4 @@
+//Diseño y funcionalidad del formulario de inicio de sesión (para asociar a JIRA)
 import React, { useState } from "react";
 import { login } from "../../services/stayloopService";
 import { useNavigate, Link } from "react-router-dom";
