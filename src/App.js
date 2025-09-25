@@ -1,28 +1,72 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
-import Home from "./components/Home";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Perfil from "./components/Perfil";
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
+import { getProfile } from "./services/stayloopService";
+
+import Home from "./pages/Home.jsx";
+import Login from "./pages/Login/Login.jsx";
+import Perfil from "./pages/Login/Perfil.jsx";
+import Register from "./pages/Login/Register.jsx";
+
+import Navbar from "./components/Navbar.jsx";
 
 function App() {
-  const [user, setUser] = useState(null);
+  function MainRouter() {
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
 
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem("stayloopUser");
-  };
+    useEffect(() => {
+      const storedUserData = localStorage.getItem("user");
+      if (storedUserData) {
+        try {
+          const userData = JSON.parse(storedUserData);
+          setUser(userData);
+        } catch (error) {
+          console.error(
+            "Error al parsear los datos de usuario de localStorage:",
+            error
+          );
+          localStorage.removeItem("user");
+        }
+      }
+    }, []);
+
+    const handleLogin = (userData) => {
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
+      navigate("/");
+    };
+
+    const handleLogout = () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setUser(null);
+      navigate("/login");
+    };
+
+    return (
+      <>
+        <Navbar user={user} onLogout={handleLogout} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/login"
+            element={<Login onLoginSuccess={handleLogin} />}
+          />
+          <Route path="/register" element={<Register />} />
+          <Route path="/perfil" element={<Perfil />} />
+        </Routes>
+      </>
+    );
+  }
 
   return (
     <Router>
-      <Header user={user} onLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login setUser={setUser} />} />
-        <Route path="/register" element={<Register setUser={setUser} />} />
-        <Route path="/perfil" element={<Perfil user={user} />} />
-      </Routes>
+      <MainRouter />
     </Router>
   );
 }

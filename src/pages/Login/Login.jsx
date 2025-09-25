@@ -1,60 +1,85 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { login } from "../../services/stayloopService";
+import { useNavigate, Link } from "react-router-dom";
 
-const Login = ({ setUser }) => {
+const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("password", password);
-
+    setError("");
     try {
-      const res = await fetch("/auth/login", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Error al iniciar sesión");
-
-      const data = await res.json();
-      setUser(data);
-      localStorage.setItem("stayloopUser", JSON.stringify(data));
-      navigate("/");
+      const response = await login(email, password);
+      if (response && response.user) {
+        onLoginSuccess(response.user);
+        navigate("/");
+      }
     } catch (err) {
-      alert("⚠️ Credenciales incorrectas o error en el login");
+      setError(err || "Error desconocido en el inicio de sesión");
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded-xl shadow-lg w-96"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">Iniciar sesión</h2>
-        <input
-          type="email"
-          placeholder="Correo"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 p-3 border rounded-lg"
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-6 p-3 border rounded-lg"
-        />
-        <button className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600">
-          Entrar
-        </button>
-      </form>
+    <div className="flex flex-1 items-center justify-center p-8">
+      <div className="w-full max-w-md rounded-2xl bg-white/90 p-8 shadow-2xl backdrop-blur-md">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            ¡Hola de nuevo!
+          </h1>
+          <p className="mt-2 text-base text-gray-600">
+            Inicia sesión para continuar.
+          </p>
+        </div>
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4">
+            <div>
+              <input
+                autoComplete="email"
+                className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder-gray-500 ring-inset ring-blue-400 transition-shadow duration-200 focus:outline-none focus:ring-2"
+                name="username"
+                placeholder="Ingresa tu correo"
+                required
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <input
+                autoComplete="current-password"
+                className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder-gray-500 ring-inset ring-blue-400 transition-shadow duration-200 focus:outline-none focus:ring-2"
+                name="password"
+                placeholder="Ingresa tu contraseña"
+                required
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+          {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+          <div>
+            <button
+              type="submit"
+              className="group relative flex w-full justify-center rounded-full border border-transparent bg-blue-600 py-3 px-4 text-base font-bold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+            >
+              Iniciar Sesión
+            </button>
+          </div>
+        </form>
+        <p className="mt-8 text-center text-sm text-gray-600">
+          No tienes una cuenta?{" "}
+          <Link
+            to="/register"
+            className="font-medium text-blue-600 hover:text-blue-700"
+          >
+            Regístrate
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
