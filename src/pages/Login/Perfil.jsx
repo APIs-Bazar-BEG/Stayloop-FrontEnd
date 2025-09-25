@@ -1,3 +1,4 @@
+// Diseño y funcionalidad de la página de perfil de usuario (para asociar a JIRA)
 import React, { useState, useEffect } from "react";
 import { getFullImageUrl } from "../../services/stayloopService"; // RUTA CORREGIDA
 
