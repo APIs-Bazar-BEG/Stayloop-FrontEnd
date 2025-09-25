@@ -1,3 +1,4 @@
+//Diseño y funcionalidad del formulario de registro (para asociar a JIRA)
 import React, { useState } from "react";
 import { register } from "../../services/stayloopService";
 import { useNavigate, Link } from "react-router-dom";
