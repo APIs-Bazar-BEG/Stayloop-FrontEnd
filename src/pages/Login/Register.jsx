@@ -8,7 +8,7 @@ const Register = () => {
     nombre: "",
     email: "",
     password: "",
-    idRol: 3,
+    idRol: 2,
     imgUsuario: null,
   });
   const [errors, setErrors] = useState({});
