@@ -5,12 +5,20 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import { getProfile } from "./services/stayloopService";
+//import { getProfile } from "./services/stayloopService";
 
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
 import Perfil from "./pages/Login/Perfil.jsx";
 import Register from "./pages/Login/Register.jsx";
+
+// Importaciones de Zonas (CRUD Completo)
+import CreateZona from "./pages/Zonas/CreateZona.jsx";
+import ZonasList from "./pages/Zonas/ZonasList.jsx";
+import UpdateZona from "./pages/Zonas/UpdateZona.jsx";
+import DeleteZona from "./pages/Zonas/DeleteZona.jsx";
+import ReadZona from "./pages/Zonas/ReadZona.jsx";
+
 
 import Navbar from "./components/Navbar.jsx";
 
@@ -59,6 +67,13 @@ function App() {
           />
           <Route path="/register" element={<Register />} />
           <Route path="/perfil" element={<Perfil />} />
+
+          {/* Rutas de Zonas */}
+          <Route path="/zonas" element={<ZonasList />} />
+          <Route path="/zonas/create" element={<CreateZona />} />
+          <Route path="/zonas/edit/:id" element={<UpdateZona />} />
+          <Route path="/zonas/delete/:id" element={<DeleteZona />} />
+          <Route path="/zonas/:id" element={<ReadZona />} />
         </Routes>
       </>
     );

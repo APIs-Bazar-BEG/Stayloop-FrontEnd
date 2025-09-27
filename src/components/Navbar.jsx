@@ -18,6 +18,9 @@ const Navbar = ({ user, onLogout }) => {
               <Link to="/hoteles" className="text-gray-600 hover:text-blue-600">
                 Hoteles
               </Link>
+                <Link to="/zonas" className="text-gray-600 hover:text-blue-600">
+                Zonas
+              </Link>
               <Link to="/perfil" className="text-gray-600 hover:text-blue-600">
                 Mi Perfil
               </Link>
