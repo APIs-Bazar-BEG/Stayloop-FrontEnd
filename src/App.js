@@ -5,29 +5,29 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import { getProfile } from "./services/stayloopService";
 
-// Componentes de Vistas de Usuario
+// Vistas principales
 import Home from "./pages/Home.jsx";
-import Login from "./pages/Login/Login.jsx";
-import Perfil from "./pages/Login/Perfil.jsx";
-import Register from "./pages/Login/Register.jsx";
 
-// Componentes del Administrador
+// Vistas Admin
 import AdminDashboard from "./pages/Gestion/AdminDashboard.jsx";
 import UserList from "./pages/Gestion/UserList.jsx";
 import UserCreate from "./pages/Gestion/UserCreate.jsx";
 import UserEdit from "./pages/Gestion/UserEdit.jsx";
 import UserDetail from "./pages/Gestion/UserDetail.jsx";
 import UserDelete from "./pages/Gestion/UserDelete.jsx";
-
-// Importaciones de Zonas (CRUD Completo)
-import CreateZona from "./pages/Zonas/CreateZona.jsx";
 import ZonasList from "./pages/Zonas/ZonasList.jsx";
+import CreateZona from "./pages/Zonas/CreateZona.jsx";
 import UpdateZona from "./pages/Zonas/UpdateZona.jsx";
 import DeleteZona from "./pages/Zonas/DeleteZona.jsx";
 import ReadZona from "./pages/Zonas/ReadZona.jsx";
+import HotelesList from "./pages/Hoteles/HotelesList.jsx";
 
+// Login y Perfil
+import Login from "./pages/Login/Login.jsx";
+import Perfil from "./pages/Login/Perfil.jsx";
+
+// Navbar
 import Navbar from "./components/Navbar.jsx";
 
 function App() {
@@ -36,18 +36,12 @@ function App() {
     const navigate = useNavigate();
 
     useEffect(() => {
-      // Al iniciar, intentamos cargar el usuario del localStorage
       const storedUserData = localStorage.getItem("user");
-
       if (storedUserData) {
         try {
-          const userData = JSON.parse(storedUserData);
-          setUser(userData);
+          setUser(JSON.parse(storedUserData));
         } catch (error) {
-          console.error(
-            "Error al parsear los datos de usuario de localStorage:",
-            error
-          );
+          console.error("Error al parsear usuario:", error);
           localStorage.removeItem("user");
         }
       }
@@ -69,23 +63,15 @@ function App() {
       <>
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
-          {/* Rutas Públicas y de Usuario */}
           <Route path="/" element={<Home />} />
+          {/* Login y Perfil */}
           <Route
             path="/login"
             element={<Login onLoginSuccess={handleLogin} />}
           />
-          <Route path="/register" element={<Register />} />
           <Route path="/perfil" element={<Perfil user={user} />} />
 
-          {/* Rutas de Zonas */}
-          <Route path="/zonas" element={<ZonasList />} />
-          <Route path="/zonas/create" element={<CreateZona />} />
-          <Route path="/zonas/edit/:id" element={<UpdateZona />} />
-          <Route path="/zonas/delete/:id" element={<DeleteZona />} />
-          <Route path="/zonas/:id" element={<ReadZona />} />
-
-          {/* --- RUTAS DE ADMINISTRACIÓN --- */}
+          {/* Admin Dashboard y CRUD */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/gestion/usuarios" element={<UserList />} />
           <Route path="/gestion/usuarios/crear" element={<UserCreate />} />
@@ -98,6 +84,14 @@ function App() {
             path="/gestion/usuarios/eliminar/:id"
             element={<UserDelete />}
           />
+
+          <Route path="/gestion/zonas" element={<ZonasList />} />
+          <Route path="/gestion/zonas/crear" element={<CreateZona />} />
+          <Route path="/gestion/zonas/editar/:id" element={<UpdateZona />} />
+          <Route path="/gestion/zonas/eliminar/:id" element={<DeleteZona />} />
+          <Route path="/gestion/zonas/:id" element={<ReadZona />} />
+
+          <Route path="/gestion/hoteles" element={<HotelesList />} />
         </Routes>
       </>
     );

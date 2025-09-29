@@ -1,5 +1,3 @@
-// src/pages/Gestion/AdminDashboard.jsx
-
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -18,6 +16,7 @@ const UserIcon = () => (
     />
   </svg>
 );
+
 const HotelIcon = () => (
   <svg
     className="w-12 h-12 text-blue-600 mb-4"
@@ -33,6 +32,7 @@ const HotelIcon = () => (
     />
   </svg>
 );
+
 const ZoneIcon = () => (
   <svg
     className="w-12 h-12 text-blue-600 mb-4"
@@ -54,6 +54,7 @@ const ZoneIcon = () => (
     />
   </svg>
 );
+
 const ReserveIcon = () => (
   <svg
     className="w-12 h-12 text-blue-600 mb-4"
@@ -102,7 +103,7 @@ const AdminDashboard = () => {
             icon={UserIcon}
             title="Gestión de Usuarios"
             description="Disponga de todas las cuentas."
-            to="/gestion/usuarios" // Ruta a UserList.jsx
+            to="/gestion/usuarios"
           />
           <Card
             icon={HotelIcon}
