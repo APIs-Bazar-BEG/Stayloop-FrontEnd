@@ -1,5 +1,3 @@
-// src/App.js
-
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -7,6 +5,7 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
+import { getProfile } from "./services/stayloopService";
 
 // Componentes de Vistas de Usuario
 import Home from "./pages/Home.jsx";
@@ -21,6 +20,13 @@ import UserCreate from "./pages/Gestion/UserCreate.jsx";
 import UserEdit from "./pages/Gestion/UserEdit.jsx";
 import UserDetail from "./pages/Gestion/UserDetail.jsx";
 import UserDelete from "./pages/Gestion/UserDelete.jsx";
+
+// Importaciones de Zonas (CRUD Completo)
+import CreateZona from "./pages/Zonas/CreateZona.jsx";
+import ZonasList from "./pages/Zonas/ZonasList.jsx";
+import UpdateZona from "./pages/Zonas/UpdateZona.jsx";
+import DeleteZona from "./pages/Zonas/DeleteZona.jsx";
+import ReadZona from "./pages/Zonas/ReadZona.jsx";
 
 import Navbar from "./components/Navbar.jsx";
 
@@ -71,6 +77,13 @@ function App() {
           />
           <Route path="/register" element={<Register />} />
           <Route path="/perfil" element={<Perfil user={user} />} />
+
+          {/* Rutas de Zonas */}
+          <Route path="/zonas" element={<ZonasList />} />
+          <Route path="/zonas/create" element={<CreateZona />} />
+          <Route path="/zonas/edit/:id" element={<UpdateZona />} />
+          <Route path="/zonas/delete/:id" element={<DeleteZona />} />
+          <Route path="/zonas/:id" element={<ReadZona />} />
 
           {/* --- RUTAS DE ADMINISTRACIÓN --- */}
           <Route path="/admin" element={<AdminDashboard />} />
