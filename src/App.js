@@ -24,11 +24,13 @@ import CreateZona from "./pages/Zonas/CreateZona.jsx";
 import UpdateZona from "./pages/Zonas/UpdateZona.jsx";
 import DeleteZona from "./pages/Zonas/DeleteZona.jsx";
 import ReadZona from "./pages/Zonas/ReadZona.jsx";
-import HotelesList from "./pages/Hoteles/HotelesList.jsx"; // Lista para Admin
+import HotelesList from "./pages/Hoteles/HotelesList.jsx";
+import ReservasList from "./pages/Reservas/ReservasList.jsx";
 
 // Login y Perfil
 import Login from "./pages/Login/Login.jsx";
 import Perfil from "./pages/Login/Perfil.jsx";
+import Register from "./pages/Login/Register.jsx";
 
 // Navbar
 import Navbar from "./components/Navbar.jsx";
@@ -82,15 +84,13 @@ function App() {
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
           {/* Ruta principal, redirige a /login si no hay usuario */}
-          <Route
-            path="/"
-            element={user ? <Home /> : <Navigate to="/login" replace />}
-          />
+          <Route path="/" element={user ? <Home /> : <Home />} />
 
           <Route
             path="/login"
             element={<Login onLoginSuccess={handleLogin} />}
           />
+          <Route path="/register" element={<Register />} />
 
           <Route
             path="/perfil"
@@ -158,7 +158,7 @@ function App() {
           />
 
           <Route
-            path="/gestion/zonas"
+            path="/zonas"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <ZonasList />
@@ -167,7 +167,7 @@ function App() {
           />
 
           <Route
-            path="/gestion/zonas/crear"
+            path="/zonas/create"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <CreateZona />
@@ -176,7 +176,7 @@ function App() {
           />
 
           <Route
-            path="/gestion/zonas/editar/:id"
+            path="/zonas/edit/:id"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <UpdateZona />
@@ -185,7 +185,7 @@ function App() {
           />
 
           <Route
-            path="/gestion/zonas/eliminar/:id"
+            path="/zonas/delete/:id"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <DeleteZona />
@@ -194,7 +194,7 @@ function App() {
           />
 
           <Route
-            path="/gestion/zonas/:id"
+            path="/zonas/:id"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <ReadZona />
@@ -207,6 +207,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <HotelesList />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 👈 RUTA A RESERVAS AÑADIDA */}
+          <Route
+            path="/gestion/reservas"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <ReservasList />
               </ProtectedRoute>
             }
           />

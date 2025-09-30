@@ -3,10 +3,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getAllReservations } from "../../services/ReservationService";
-// Asume que tienes estos servicios para resolver los nombres de ID a texto
-import { getHotelDetail } from "../../services/HotelService";
-import { getRoomTypeById } from "../../services/RoomTypeService";
-import { getUserById } from "../../services/UserService";
+
+// --- IMPORTACIONES CORREGIDAS ---
+// 1. USUARIOS: Usar AdminService para obtener detalles de usuario
+import { getUserById } from "../../services/AdminService"; // 👈 Corregido
+
+// 2. HOTELES: Usar hotelesService (en minúsculas) y la función getHotelById
+import { getHotelById } from "../../services/HotelesService"; // 👈 Corregido el nombre del archivo
+
+// 3. TIPOS DE HABITACIÓN: Usar el archivo RoomTypeService (debe existir)
+import { getRoomTypeById } from "../../services/RoomTypeService"; // 👈 Asumiendo que este archivo ya existe
 
 // Función utilitaria para formatear fecha/hora (simulando Thymeleaf)
 const formatDate = (dateString) => {
@@ -33,6 +39,7 @@ const enrichReservation = async (reserva) => {
   // Obtener y cachear el nombre del usuario
   if (idUsuario && !entityCache.users[idUsuario]) {
     try {
+      // Usamos getUserById de AdminService
       const user = await getUserById(idUsuario);
       entityCache.users[idUsuario] = user.nombre || `Usuario #${idUsuario}`;
     } catch {
@@ -43,7 +50,8 @@ const enrichReservation = async (reserva) => {
   // Obtener y cachear el nombre del hotel
   if (idHotel && !entityCache.hotels[idHotel]) {
     try {
-      const hotel = await getHotelDetail(idHotel);
+      // Usamos getHotelById de hotelesService
+      const hotel = await getHotelById(idHotel);
       entityCache.hotels[idHotel] = hotel.nombre || `Hotel #${idHotel}`;
     } catch {
       entityCache.hotels[idHotel] = `Hotel #${idHotel} (Error)`;
@@ -327,11 +335,11 @@ const ReservasList = () => {
                 key={pageNum}
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-4 py-2 border rounded font-medium transition-colors 
-                                    ${
-                                      pageNum === currentPage
-                                        ? "bg-blue-600 text-white border-blue-600"
-                                        : "bg-white text-gray-700 hover:bg-gray-100"
-                                    }`}
+                                          ${
+                                            pageNum === currentPage
+                                              ? "bg-blue-600 text-white border-blue-600"
+                                              : "bg-white text-gray-700 hover:bg-gray-100"
+                                          }`}
               >
                 {pageNum + 1}
               </button>

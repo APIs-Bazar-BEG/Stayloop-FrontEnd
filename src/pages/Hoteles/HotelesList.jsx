@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from "react";
-import { getHoteles, deleteHotel } from "../../services/hotelesService";
+import { getHoteles, deleteHotel } from "../../services/HotelesService";
 import { Link } from "react-router-dom";
 
 const HotelesList = () => {

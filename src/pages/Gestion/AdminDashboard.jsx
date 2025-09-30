@@ -115,7 +115,7 @@ const AdminDashboard = () => {
             icon={ZoneIcon}
             title="Config. Zonas"
             description="Gestione las zonas disponibles."
-            to="/gestion/zonas"
+            to="/zonas"
           />
           <Card
             icon={ReserveIcon}

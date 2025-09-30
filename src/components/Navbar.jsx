@@ -13,9 +13,6 @@ const Navbar = ({ user, onLogout }) => {
 
   // Definición de enlaces de navegación
   const navLinks = [
-    // El enlace principal (Home) siempre debe ser visible
-    { to: "/", label: "Home", requiresAuth: false },
-    // El enlace de Hoteles solo es visible para clientes logueados (No Admin)
     {
       to: "/hoteles",
       label: "Hoteles",
@@ -70,9 +67,16 @@ const Navbar = ({ user, onLogout }) => {
               }
               return null; // No logueado, requiere auth, no muestra
             }
-            // Los enlaces que NO requieren autenticación (solo Home en esta lista)
-            // Ya el Logo maneja el link al Home, pero lo dejamos por consistencia
-            return null;
+            // --- CORRECCIÓN DE HOME: si no requiere auth, lo mostramos ---
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="text-gray-600 hover:text-blue-600 font-medium"
+              >
+                {link.label}
+              </Link>
+            );
           })}
         </div>
 
