@@ -26,9 +26,6 @@ import DeleteZona from "./pages/Zonas/DeleteZona.jsx";
 import ReadZona from "./pages/Zonas/ReadZona.jsx";
 import HotelesList from "./pages/Hoteles/HotelesList.jsx"; // Lista para Admin
 
-// Vistas Cliente
-import HotelListClient from "./pages/Reservas/HotelListClient.jsx"; // <-- IMPORTACIÓN NECESARIA PARA EL CLIENTE
-
 // Login y Perfil
 import Login from "./pages/Login/Login.jsx";
 import Perfil from "./pages/Login/Perfil.jsx";
@@ -73,8 +70,9 @@ function App() {
         return <Navigate to="/login" replace />; // No logueado
       }
       if (allowedRoleIds && !allowedRoleIds.includes(user.idRol)) {
-        // Usuario logueado pero sin el rol permitido, redirige al home del cliente.
-        return <Navigate to="/hoteles" replace />;
+        // Usuario logueado pero sin el rol permitido, redirige a Home (ruta default)
+        // Ya que la ruta /hoteles fue eliminada
+        return <Navigate to="/" replace />;
       }
       return children;
     };
@@ -83,6 +81,7 @@ function App() {
       <>
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
+          {/* Ruta principal, redirige a /login si no hay usuario */}
           <Route
             path="/"
             element={user ? <Home /> : <Navigate to="/login" replace />}
@@ -101,14 +100,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/hoteles"
-            element={
-              <ProtectedRoute>
-                <HotelListClient />
-              </ProtectedRoute>
-            }
-          />
+
+          {/* ❌ RUTA /hoteles (Cliente) ELIMINADA ❌ */}
 
           <Route
             path="/admin"
