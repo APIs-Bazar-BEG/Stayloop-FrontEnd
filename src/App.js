@@ -1,9 +1,12 @@
+// src/App.js
+
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useNavigate,
+  Navigate, // Importamos Navigate para proteger las rutas
 } from "react-router-dom";
 
 // Vistas principales
@@ -21,7 +24,10 @@ import CreateZona from "./pages/Zonas/CreateZona.jsx";
 import UpdateZona from "./pages/Zonas/UpdateZona.jsx";
 import DeleteZona from "./pages/Zonas/DeleteZona.jsx";
 import ReadZona from "./pages/Zonas/ReadZona.jsx";
-import HotelesList from "./pages/Hoteles/HotelesList.jsx";
+import HotelesList from "./pages/Hoteles/HotelesList.jsx"; // Lista para Admin
+
+// Vistas Cliente
+import HotelListClient from "./pages/Reservas/HotelListClient.jsx"; // <-- IMPORTACIÓN NECESARIA PARA EL CLIENTE
 
 // Login y Perfil
 import Login from "./pages/Login/Login.jsx";
@@ -29,6 +35,8 @@ import Perfil from "./pages/Login/Perfil.jsx";
 
 // Navbar
 import Navbar from "./components/Navbar.jsx";
+
+const ADMIN_ROLE_ID = 1;
 
 function App() {
   function MainRouter() {
@@ -59,39 +67,156 @@ function App() {
       navigate("/login");
     };
 
+    // Componente de Ruta Protegida para manejar el acceso por autenticación y rol
+    const ProtectedRoute = ({ children, allowedRoleIds }) => {
+      if (!user) {
+        return <Navigate to="/login" replace />; // No logueado
+      }
+      if (allowedRoleIds && !allowedRoleIds.includes(user.idRol)) {
+        // Usuario logueado pero sin el rol permitido, redirige al home del cliente.
+        return <Navigate to="/hoteles" replace />;
+      }
+      return children;
+    };
+
     return (
       <>
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
-          <Route path="/" element={<Home />} />
-          {/* Login y Perfil */}
+          <Route
+            path="/"
+            element={user ? <Home /> : <Navigate to="/login" replace />}
+          />
+
           <Route
             path="/login"
             element={<Login onLoginSuccess={handleLogin} />}
           />
-          <Route path="/perfil" element={<Perfil user={user} />} />
 
-          {/* Admin Dashboard y CRUD */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/gestion/usuarios" element={<UserList />} />
-          <Route path="/gestion/usuarios/crear" element={<UserCreate />} />
-          <Route path="/gestion/usuarios/editar/:id" element={<UserEdit />} />
+          <Route
+            path="/perfil"
+            element={
+              <ProtectedRoute>
+                <Perfil user={user} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hoteles"
+            element={
+              <ProtectedRoute>
+                <HotelListClient />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/gestion/usuarios"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <UserList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/gestion/usuarios/crear"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <UserCreate />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/gestion/usuarios/editar/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <UserEdit />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/gestion/usuarios/detalles/:id"
-            element={<UserDetail />}
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <UserDetail />
+              </ProtectedRoute>
+            }
           />
+
           <Route
             path="/gestion/usuarios/eliminar/:id"
-            element={<UserDelete />}
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <UserDelete />
+              </ProtectedRoute>
+            }
           />
 
-          <Route path="/gestion/zonas" element={<ZonasList />} />
-          <Route path="/gestion/zonas/crear" element={<CreateZona />} />
-          <Route path="/gestion/zonas/editar/:id" element={<UpdateZona />} />
-          <Route path="/gestion/zonas/eliminar/:id" element={<DeleteZona />} />
-          <Route path="/gestion/zonas/:id" element={<ReadZona />} />
+          <Route
+            path="/gestion/zonas"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <ZonasList />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/gestion/hoteles" element={<HotelesList />} />
+          <Route
+            path="/gestion/zonas/crear"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <CreateZona />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/gestion/zonas/editar/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <UpdateZona />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/gestion/zonas/eliminar/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <DeleteZona />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/gestion/zonas/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <ReadZona />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/gestion/hoteles"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <HotelesList />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </>
     );

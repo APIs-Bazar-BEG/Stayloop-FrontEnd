@@ -1,4 +1,5 @@
-//Diseño y funcionalidad del formulario de inicio de sesión (para asociar a JIRA)
+// src/pages/Login/Login.jsx
+
 import React, { useState } from "react";
 import { login } from "../../services/stayloopService";
 import { useNavigate, Link } from "react-router-dom";
@@ -9,17 +10,31 @@ const Login = ({ onLoginSuccess }) => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // ID del rol de Administrador, basado en tu lógica de Navbar
+  const ADMIN_ROLE_ID = 1;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
       const response = await login(email, password);
       if (response && response.user) {
-        onLoginSuccess(response.user);
-        navigate("/");
+        const user = response.user; // 1. Notificar al componente superior (App.js) para actualizar el estado global.
+
+        onLoginSuccess(user); // 2. Lógica de Redirección Condicional
+
+        if (user.idRol === ADMIN_ROLE_ID) {
+          navigate("/admin"); // Redirigir al Administrador
+        } else {
+          navigate("/hoteles"); // Redirigir al Cliente a la lista de hoteles
+        }
       }
     } catch (err) {
-      setError(err || "Error desconocido en el inicio de sesión");
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Error desconocido en el inicio de sesión";
+      setError(errorMessage);
     }
   };
 
@@ -72,7 +87,7 @@ const Login = ({ onLoginSuccess }) => {
           </div>
         </form>
         <p className="mt-8 text-center text-sm text-gray-600">
-          No tienes una cuenta?{" "}
+          No tienes una cuenta?
           <Link
             to="/register"
             className="font-medium text-blue-600 hover:text-blue-700"
