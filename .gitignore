@@ -8,8 +8,8 @@
 # testing
 /coverage
 
-# production
-/build
+# production (Debe subirse para poder desplegar en Vercel)
+#/build
 
 # misc
 .DS_Store
