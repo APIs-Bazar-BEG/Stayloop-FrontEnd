@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getReservationById } from "../../services/ReservationService";
 // Asumimos que estos servicios están disponibles para resolver los nombres:
-import { getHotelDetail } from "../../services/HotelService";
+import { getHotelDetail } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
 import { getUserById } from "../../services/UserService";
 

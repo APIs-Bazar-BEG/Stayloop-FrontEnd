@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createReservation } from "../../services/ReservationService";
 // Asumimos que tienes estos servicios listos para cargar los detalles por ID:
-import { getHotelDetail } from "../../services/HotelService";
+import { getHotelDetail } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
 import { getUserById } from "../../services/UserService";
 // Asume que la ID del usuario logueado está disponible (e.g., de tu AuthContext o localStorage)

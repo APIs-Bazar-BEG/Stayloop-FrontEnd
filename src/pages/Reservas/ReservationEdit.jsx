@@ -7,7 +7,7 @@ import {
   updateReservation,
 } from "../../services/ReservationService";
 // Asumimos que estos servicios están listos:
-import { getHotelDetail } from "../../services/HotelService";
+import { getHotelDetail } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
 import { getUserById } from "../../services/UserService";
 
