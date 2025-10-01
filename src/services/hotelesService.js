@@ -37,10 +37,13 @@ export const getHotelById = async (id) => {
 };
 
 // --- CREATE ---
-export const createHotel = async (hotelData) => {
+export const createHotel = async (formData) => {
+  // formData es una instancia de FormData que puede contener archivos (File/Blob) y campos de texto
   try {
-    const response = await api.post("/hotels/create", hotelData, {
-      headers: getAuthHeaders(),
+    const response = await api.post("/hotels/create", formData, {
+      headers: {
+        ...getAuthHeaders(),
+      },
     });
     return response.data;
   } catch (error) {
