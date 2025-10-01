@@ -9,7 +9,7 @@ import { getAllReservations } from "../../services/ReservationService";
 import { getUserById } from "../../services/AdminService"; // 👈 Corregido
 
 // 2. HOTELES: Usar hotelesService (en minúsculas) y la función getHotelById
-import { getHotelById } from "../../services/hotelesServiceotelesService"; // 👈 Corregido el nombre del archivo
+import { getHotelById } from "../../services/hotelesService"; // 👈 Corregido el nombre del archivo
 
 // 3. TIPOS DE HABITACIÓN: Usar el archivo RoomTypeService (debe existir)
 import { getRoomTypeById } from "../../services/RoomTypeService"; // 👈 Asumiendo que este archivo ya existe
