@@ -30,11 +30,7 @@ const Login = ({ onLoginSuccess }) => {
         }
       }
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Error desconocido en el inicio de sesión";
-      setError(errorMessage);
+      
     }
   };
 
