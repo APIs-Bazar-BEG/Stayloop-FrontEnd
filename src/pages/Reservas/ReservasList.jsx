@@ -4,21 +4,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getAllReservations } from "../../services/ReservationService";
 
-// --- IMPORTACIONES CORREGIDAS ---
-// 1. USUARIOS: Usar AdminService para obtener detalles de usuario
-import { getUserById } from "../../services/AdminService"; // 👈 Corregido
+import { getUserById } from "../../services/AdminService";
+import { getHotelById } from "../../services/HotelesService";
+import { getRoomTypeById } from "../../services/RoomTypeService";
 
-// 2. HOTELES: Usar hotelesService (en minúsculas) y la función getHotelById
-import { getHotelById } from "../../services/hotelesService"; // 👈 Corregido el nombre del archivo
-
-// 3. TIPOS DE HABITACIÓN: Usar el archivo RoomTypeService (debe existir)
-import { getRoomTypeById } from "../../services/RoomTypeService"; // 👈 Asumiendo que este archivo ya existe
-
-// Función utilitaria para formatear fecha/hora (simulando Thymeleaf)
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
-  // Formato dd-MM-yyyy HH:mm
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
@@ -27,19 +19,12 @@ const formatDate = (dateString) => {
   return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
-// Caché para nombres de entidades (optimización para evitar recargas excesivas de metadata)
 const entityCache = { users: {}, hotels: {}, roomTypes: {} };
 
-/**
- * Obtiene los nombres de las entidades relacionadas de una reserva usando caché.
- */
 const enrichReservation = async (reserva) => {
   const { idUsuario, idHotel, idTipoHabitacion } = reserva;
-
-  // Obtener y cachear el nombre del usuario
   if (idUsuario && !entityCache.users[idUsuario]) {
     try {
-      // Usamos getUserById de AdminService
       const user = await getUserById(idUsuario);
       entityCache.users[idUsuario] = user.nombre || `Usuario #${idUsuario}`;
     } catch {
@@ -47,10 +32,8 @@ const enrichReservation = async (reserva) => {
     }
   }
 
-  // Obtener y cachear el nombre del hotel
   if (idHotel && !entityCache.hotels[idHotel]) {
     try {
-      // Usamos getHotelById de hotelesService
       const hotel = await getHotelById(idHotel);
       entityCache.hotels[idHotel] = hotel.nombre || `Hotel #${idHotel}`;
     } catch {
@@ -58,7 +41,6 @@ const enrichReservation = async (reserva) => {
     }
   }
 
-  // Obtener y cachear el nombre del tipo de habitación
   if (idTipoHabitacion && !entityCache.roomTypes[idTipoHabitacion]) {
     try {
       const roomType = await getRoomTypeById(idTipoHabitacion);
@@ -80,7 +62,6 @@ const enrichReservation = async (reserva) => {
 };
 
 const ReservasList = () => {
-  // Para manejar los filtros y paginación desde la URL
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [reservasData, setReservasData] = useState({
@@ -91,39 +72,56 @@ const ReservasList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Estado interno para el formulario de filtros (sincronizado con URL)
   const [filterForm, setFilterForm] = useState({
     idUsuario: searchParams.get("idUsuario") || "",
     idHotel: searchParams.get("idHotel") || "",
     totalMin: searchParams.get("totalMin") || "",
   });
 
-  // Lógica para obtener los datos
   const fetchReservations = useCallback(async (params) => {
     setLoading(true);
     setError(null);
     try {
       const listData = await getAllReservations(params);
 
-      // Enriquecer las reservas (obtener nombres de entidades)
+      let reservasArray = [];
+      let paginationData = { totalPages: 0, number: 0 };
+
+      if (listData && Array.isArray(listData.content)) {
+        reservasArray = listData.content;
+        paginationData = listData;
+      } else if (listData && Array.isArray(listData)) {
+        console.warn(
+          "La API devolvió un array directo. Asumiendo una sola página."
+        );
+        reservasArray = listData;
+        paginationData = { totalPages: 1, number: 0 };
+      } else {
+        console.error(
+          "Respuesta inesperada o nula de la API de reservas:",
+          listData
+        );
+        setReservasData({ content: [], totalPages: 0, number: 0 });
+        return;
+      }
       const enrichedReservas = await Promise.all(
-        listData.content.map(enrichReservation)
+        reservasArray.map(enrichReservation)
       );
 
       setReservasData({
-        ...listData,
+        ...paginationData,
         content: enrichedReservas,
       });
     } catch (err) {
-      console.error(err);
+      console.error("Error en la llamada a getAllReservations:", err);
       setError("Error al cargar la lista de reservas.");
+      setReservasData({ content: [], totalPages: 0, number: 0 });
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    // Obtener filtros y página de la URL para la llamada API
     const params = {};
     searchParams.forEach((value, key) => {
       if (value) params[key] = value;
@@ -132,23 +130,19 @@ const ReservasList = () => {
     fetchReservations(params);
   }, [searchParams, fetchReservations]);
 
-  // Manejador del formulario de filtros
   const handleFilterSubmit = (e) => {
     e.preventDefault();
 
     const newParams = {};
-    // Sincronizar el estado del formulario con los parámetros de búsqueda de la URL
     Object.entries(filterForm).forEach(([key, value]) => {
       if (value) newParams[key] = value;
     });
 
-    // Mantener la página actual si los filtros no cambian, o resetear a la página 0 si cambian
     newParams.page = 0;
 
     setSearchParams(newParams);
   };
 
-  // Manejador para el input de filtros
   const handleFilterChange = (e) => {
     setFilterForm({
       ...filterForm,
@@ -156,7 +150,6 @@ const ReservasList = () => {
     });
   };
 
-  // Lógica de paginación
   const pageNumbers = [];
   for (let i = 0; i < reservasData.totalPages; i++) {
     pageNumbers.push(i);
@@ -165,7 +158,6 @@ const ReservasList = () => {
   const currentPage = reservasData.number;
 
   const handlePageChange = (pageNum) => {
-    // Mantener los filtros actuales y solo cambiar la página
     const currentFilters = {};
     searchParams.forEach((value, key) => {
       if (value && key !== "page") currentFilters[key] = value;
@@ -190,6 +182,7 @@ const ReservasList = () => {
           <h2 className="text-3xl font-bold text-gray-900">
             Listado de Reservas
           </h2>
+
           <Link
             to="/reservas/create"
             className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md"
@@ -198,7 +191,6 @@ const ReservasList = () => {
           </Link>
         </div>
 
-        {/* Filtros */}
         <form
           onSubmit={handleFilterSubmit}
           className="mb-6 flex flex-wrap gap-4 bg-white p-4 rounded-xl shadow"
@@ -239,7 +231,6 @@ const ReservasList = () => {
           </button>
         </form>
 
-        {/* Tabla de reservas */}
         <div className="overflow-x-auto bg-white shadow-xl rounded-xl">
           <table className="min-w-full divide-y divide-gray-200 border-collapse">
             <thead className="bg-gray-50">
@@ -247,29 +238,37 @@ const ReservasList = () => {
                 <th className="py-3 px-4 border border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   ID
                 </th>
+
                 <th className="py-3 px-4 border border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Usuario
                 </th>
+
                 <th className="py-3 px-4 border border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Hotel
                 </th>
+
                 <th className="py-3 px-4 border border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tipo Habitación
                 </th>
+
                 <th className="py-3 px-4 border border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Inicio
                 </th>
+
                 <th className="py-3 px-4 border border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Fin
                 </th>
+
                 <th className="py-3 px-4 border border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Total
                 </th>
+
                 <th className="py-3 px-4 border border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Acciones
                 </th>
               </tr>
             </thead>
+
             <tbody className="bg-white divide-y divide-gray-200">
               {reservasData.content.map((reserva) => (
                 <tr
@@ -279,24 +278,31 @@ const ReservasList = () => {
                   <td className="py-2 px-4 border text-sm font-medium text-gray-900">
                     {reserva.id}
                   </td>
+
                   <td className="py-2 px-4 border text-sm text-gray-700">
                     {reserva.nombreUsuario}
                   </td>
+
                   <td className="py-2 px-4 border text-sm text-gray-700">
                     {reserva.nombreHotel}
                   </td>
+
                   <td className="py-2 px-4 border text-sm text-gray-700">
                     {reserva.nombreTipoHabitacion}
                   </td>
+
                   <td className="py-2 px-4 border text-sm text-gray-700">
                     {formatDate(reserva.fechaInicio)}
                   </td>
+
                   <td className="py-2 px-4 border text-sm text-gray-700">
                     {formatDate(reserva.fechaFin)}
                   </td>
+
                   <td className="py-2 px-4 border text-sm font-bold text-gray-800">
                     ${(reserva.total || 0).toFixed(2)}
                   </td>
+
                   <td className="py-2 px-4 border flex gap-2">
                     <Link
                       to={`/reservas/details/${reserva.id}`}
@@ -304,6 +310,7 @@ const ReservasList = () => {
                     >
                       Ver
                     </Link>
+
                     <Link
                       to={`/reservas/delete/${reserva.id}`}
                       className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition-colors"
@@ -313,6 +320,7 @@ const ReservasList = () => {
                   </td>
                 </tr>
               ))}
+
               {reservasData.content.length === 0 && (
                 <tr>
                   <td
@@ -326,8 +334,6 @@ const ReservasList = () => {
             </tbody>
           </table>
         </div>
-
-        {/* Paginación */}
         {reservasData.totalPages > 1 && (
           <div className="mt-6 flex justify-center gap-2">
             {pageNumbers.map((pageNum) => (
@@ -335,11 +341,11 @@ const ReservasList = () => {
                 key={pageNum}
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-4 py-2 border rounded font-medium transition-colors 
-                                          ${
-                                            pageNum === currentPage
-                                              ? "bg-blue-600 text-white border-blue-600"
-                                              : "bg-white text-gray-700 hover:bg-gray-100"
-                                          }`}
+                 ${
+                   pageNum === currentPage
+                     ? "bg-blue-600 text-white border-blue-600"
+                     : "bg-white text-gray-700 hover:bg-gray-100"
+                 }`}
               >
                 {pageNum + 1}
               </button>

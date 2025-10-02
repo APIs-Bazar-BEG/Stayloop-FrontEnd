@@ -6,7 +6,7 @@ import {
   Routes,
   Route,
   useNavigate,
-  Navigate, // Importamos Navigate para proteger las rutas
+  Navigate,
 } from "react-router-dom";
 
 // Vistas principales
@@ -26,6 +26,10 @@ import DeleteZona from "./pages/Zonas/DeleteZona.jsx";
 import ReadZona from "./pages/Zonas/ReadZona.jsx";
 import HotelesList from "./pages/Hoteles/HotelesList.jsx";
 import ReservasList from "./pages/Reservas/ReservasList.jsx";
+import ReservationCreate from "./pages/Reservas/ReservationCreate.jsx";
+import ReservationEdit from "./pages/Reservas/ReservationEdit.jsx";
+import ReservationDetails from "./pages/Reservas/ReservationDetails.jsx";
+import ReservationDelete from "./pages/Reservas/ReservationDelete.jsx";
 
 // Login y Perfil
 import Login from "./pages/Login/Login.jsx";
@@ -66,14 +70,11 @@ function App() {
       navigate("/login");
     };
 
-    // Componente de Ruta Protegida para manejar el acceso por autenticación y rol
     const ProtectedRoute = ({ children, allowedRoleIds }) => {
       if (!user) {
-        return <Navigate to="/login" replace />; // No logueado
+        return <Navigate to="/login" replace />;
       }
       if (allowedRoleIds && !allowedRoleIds.includes(user.idRol)) {
-        // Usuario logueado pero sin el rol permitido, redirige a Home (ruta default)
-        // Ya que la ruta /hoteles fue eliminada
         return <Navigate to="/" replace />;
       }
       return children;
@@ -83,7 +84,6 @@ function App() {
       <>
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
-          {/* Ruta principal, redirige a /login si no hay usuario */}
           <Route path="/" element={user ? <Home /> : <Home />} />
 
           <Route
@@ -100,8 +100,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* ❌ RUTA /hoteles (Cliente) ELIMINADA ❌ */}
 
           <Route
             path="/admin"
@@ -211,12 +209,56 @@ function App() {
             }
           />
 
-          {/* 👈 RUTA A RESERVAS AÑADIDA */}
           <Route
             path="/gestion/reservas"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <ReservasList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reservas"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <ReservasList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reservas/create"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <ReservationCreate />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reservas/edit/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <ReservationEdit />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reservas/details/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <ReservationDetails />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reservas/delete/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <ReservationDelete />
               </ProtectedRoute>
             }
           />

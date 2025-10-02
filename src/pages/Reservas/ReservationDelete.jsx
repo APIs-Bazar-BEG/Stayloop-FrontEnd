@@ -7,9 +7,9 @@ import {
   deleteReservation,
 } from "../../services/ReservationService";
 // Asumimos que estos servicios están disponibles para resolver los nombres:
-import { getHotelDetail } from "../../services/hotelesService";
+import { getHotelById } from "../../services/HotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
-import { getUserById } from "../../services/UserService";
+import { getUserById } from "../../services/AdminService";
 
 // Función utilitaria para formatear fecha/hora
 const formatDate = (dateString) => {
@@ -55,7 +55,7 @@ const ReservationDelete = () => {
           getUserById(reservationData.idUsuario).catch(() => ({
             nombre: `Usuario #${reservationData.idUsuario}`,
           })),
-          getHotelDetail(reservationData.idHotel).catch(() => ({
+          getHotelById(reservationData.idHotel).catch(() => ({
             nombre: `Hotel #${reservationData.idHotel}`,
           })),
           getRoomTypeById(reservationData.idTipoHabitacion).catch(() => ({

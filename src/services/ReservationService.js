@@ -3,7 +3,6 @@
 import axios from "axios";
 
 // Creamos la instancia de Axios usando el baseURL: "/"
-// Esto permite que el proxy de desarrollo maneje las peticiones durante el desarrollo local.
 const api = axios.create({
   baseURL: "/",
 });
@@ -15,7 +14,6 @@ const getAuthHeaders = () => {
   const token = getToken();
 
   if (!token) {
-    // Es buena práctica devolver un objeto vacío o lanzar un error si no hay token
     return { headers: {} };
   }
 
@@ -27,30 +25,19 @@ const getAuthHeaders = () => {
   };
 };
 
-/**
- * Obtiene la lista de reservas con filtros y paginación.
- * La API es: GET /reservations/getall
- * @param {object} params - { idUsuario, idHotel, totalMin, page, size }
- */
 export const getAllReservations = async (params = {}) => {
   try {
-    // Usamos la instancia 'api' con la ruta relativa
     const response = await api.get(`/reservations/getall`, {
-      headers: getAuthHeaders().headers, // Pasamos solo el objeto headers
+      headers: getAuthHeaders().headers,
       params: params,
     });
     return response.data;
   } catch (error) {
     console.error("Error al obtener la lista de reservas:", error);
-    // Es vital lanzar el error para que el componente lo pueda atrapar
     throw error;
   }
 };
 
-/**
- * Crea una nueva reserva.
- * La API es: POST /reservations/create
- */
 export const createReservation = async (reservationData) => {
   try {
     const response = await api.post(
@@ -65,13 +52,12 @@ export const createReservation = async (reservationData) => {
   }
 };
 
-/**
- * Obtiene el detalle de una reserva específica.
- * La API es: GET /reservations/{id}
- */
 export const getReservationById = async (id) => {
   try {
-    const response = await api.get(`/reservations/${id}`, getAuthHeaders());
+    const response = await api.get(
+      `/reservations/getbyid/${id}`,
+      getAuthHeaders()
+    );
     return response.data;
   } catch (error) {
     console.error(`Error al obtener reserva #${id}:`, error);
@@ -79,10 +65,6 @@ export const getReservationById = async (id) => {
   }
 };
 
-/**
- * Actualiza una reserva existente.
- * La API es: POST /reservations/update/{id} (o PUT/PATCH)
- */
 export const updateReservation = async (id, reservationData) => {
   try {
     const response = await api.post(
@@ -99,10 +81,6 @@ export const updateReservation = async (id, reservationData) => {
   }
 };
 
-/**
- * Elimina una reserva por su ID.
- * La API es: POST /reservations/delete/{id}
- */
 export const deleteReservation = async (id) => {
   try {
     const response = await api.post(

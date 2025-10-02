@@ -6,20 +6,16 @@ import {
   getReservationById,
   updateReservation,
 } from "../../services/ReservationService";
-// Asumimos que estos servicios están listos:
-import { getHotelDetail } from "../../services/hotelesService";
+import { getHotelById } from "../../services/HotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
-import { getUserById } from "../../services/UserService";
+import { getUserById } from "../../services/AdminService";
 
-// Función para formatear fechas a YYYY-MM-DDTHH:MM (el formato que requiere el input datetime-local)
 const formatToDatetimeLocal = (dateString) => {
   if (!dateString) return "";
 
-  // Si la fecha ya está en formato ISO, usar directamente
   const date = new Date(dateString);
   if (isNaN(date)) return "";
 
-  // Convertir a formato local para el input
   const offset = date.getTimezoneOffset() * 60000;
   const localTime = new Date(date.getTime() - offset)
     .toISOString()
@@ -29,7 +25,7 @@ const formatToDatetimeLocal = (dateString) => {
 
 const ReservationEdit = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Obtiene el ID de la URL: /reservas/edit/:id
+  const { id } = useParams();
 
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState(null);
@@ -40,7 +36,6 @@ const ReservationEdit = () => {
     precioPorNoche: 0,
   });
 
-  // 1. Estado inicial del formulario
   const [form, setForm] = useState({
     id: id,
     idUsuario: "",
@@ -53,7 +48,6 @@ const ReservationEdit = () => {
   });
   const [validationErrors, setValidationErrors] = useState({});
 
-  // 2. Carga inicial de datos (Reserva y Metadata)
   useEffect(() => {
     const fetchReservationData = async () => {
       if (!id) {
@@ -62,30 +56,25 @@ const ReservationEdit = () => {
         return;
       }
       try {
-        // Paso 1: Obtener la reserva por ID
         const reservation = await getReservationById(id);
 
-        // Paso 2: Obtener la metadata relacionada
         const [user, hotel, roomType] = await Promise.all([
           getUserById(reservation.idUsuario),
-          getHotelDetail(reservation.idHotel),
+          getHotelById(reservation.idHotel),
           getRoomTypeById(reservation.idTipoHabitacion),
         ]);
 
-        // Paso 3: Rellenar el formulario con los datos existentes
         setForm({
           id: id,
           idUsuario: reservation.idUsuario,
           idHotel: reservation.idHotel,
           idTipoHabitacion: reservation.idTipoHabitacion,
-          // Formatear las fechas para el input type="datetime-local"
           fechaRealizado: formatToDatetimeLocal(reservation.fechaRealizado),
           fechaInicio: formatToDatetimeLocal(reservation.fechaInicio),
           fechaFin: formatToDatetimeLocal(reservation.fechaFin),
           total: reservation.total || 0.0,
         });
 
-        // Paso 4: Establecer la metadata
         setMetadata({
           usuario: user,
           hotel: hotel,
@@ -102,7 +91,6 @@ const ReservationEdit = () => {
     fetchReservationData();
   }, [id]);
 
-  // 3. Cálculo del Total (Función que se ejecuta con el cambio de fechas)
   const calcularTotal = useCallback(() => {
     const { fechaInicio, fechaFin } = form;
     const precio = metadata.precioPorNoche;
@@ -127,26 +115,22 @@ const ReservationEdit = () => {
   }, [form.fechaInicio, form.fechaFin, metadata.precioPorNoche]);
 
   useEffect(() => {
-    // Recalcular solo si metadata está cargada y las fechas son válidas.
     if (!loading && metadata.precioPorNoche > 0) {
       calcularTotal();
     }
   }, [calcularTotal, loading, metadata.precioPorNoche]);
 
-  // 4. Manejo de cambios en el formulario
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
     setValidationErrors((prev) => ({ ...prev, [id]: undefined }));
   };
 
-  // 5. Manejo del Submit del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError(null);
     setValidationErrors({});
 
-    // Validación simple antes de enviar
     if (!form.fechaInicio || !form.fechaFin || form.total <= 0) {
       setValidationErrors({
         fechaInicio: !form.fechaInicio
@@ -162,7 +146,6 @@ const ReservationEdit = () => {
     }
 
     try {
-      // Eliminar el ID para el cuerpo del POST/PUT, aunque lo pasamos por la URL
       const { id: formId, ...dataToUpdate } = form;
 
       await updateReservation(formId, dataToUpdate);
@@ -215,7 +198,6 @@ const ReservationEdit = () => {
           />
           <input type="hidden" id="precio" value={metadata.precioPorNoche} />
 
-          {/* Campos de solo lectura (Metadatos) */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Usuario
@@ -247,7 +229,6 @@ const ReservationEdit = () => {
             </span>
           </div>
 
-          {/* Fecha realizado (Solo lectura) */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Fecha realizado
@@ -260,7 +241,6 @@ const ReservationEdit = () => {
             />
           </div>
 
-          {/* Fecha inicio */}
           <div>
             <label
               htmlFor="fechaInicio"
@@ -286,7 +266,6 @@ const ReservationEdit = () => {
             )}
           </div>
 
-          {/* Fecha fin */}
           <div>
             <label
               htmlFor="fechaFin"
@@ -317,7 +296,6 @@ const ReservationEdit = () => {
               )}
           </div>
 
-          {/* Total (Solo lectura) */}
           <div>
             <label
               htmlFor="total"
@@ -336,7 +314,6 @@ const ReservationEdit = () => {
             />
           </div>
 
-          {/* Botones */}
           <div className="flex flex-col sm:flex-row-reverse gap-4 pt-4">
             <button
               type="submit"

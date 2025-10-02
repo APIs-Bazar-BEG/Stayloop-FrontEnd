@@ -3,16 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getReservationById } from "../../services/ReservationService";
-// Asumimos que estos servicios están disponibles para resolver los nombres:
-import { getHotelDetail } from "../../services/hotelesService";
+import { getHotelById } from "../../services/HotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
-import { getUserById } from "../../services/UserService";
+import { getUserById } from "../../services/AdminService";
 
-// Función utilitaria para formatear fecha/hora (simulando Thymeleaf)
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
-  // Formato dd-MM-yyyy HH:mm
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
@@ -23,7 +20,7 @@ const formatDate = (dateString) => {
 
 const ReservationDetails = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Obtiene el ID de la URL: /reservas/details/:id
+  const { id } = useParams();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,7 +31,6 @@ const ReservationDetails = () => {
     nombreTipoHabitacion: "Cargando...",
   });
 
-  // Carga de la reserva y su metadata
   useEffect(() => {
     const fetchReservationData = async () => {
       if (!id) {
@@ -43,16 +39,14 @@ const ReservationDetails = () => {
         return;
       }
       try {
-        // Paso 1: Obtener la reserva por ID
         const reservationData = await getReservationById(id);
         setReserva(reservationData);
 
-        // Paso 2: Obtener la metadata relacionada para mostrar nombres
         const [user, hotel, roomType] = await Promise.all([
           getUserById(reservationData.idUsuario).catch(() => ({
             nombre: `Usuario #${reservationData.idUsuario} (Error)`,
           })),
-          getHotelDetail(reservationData.idHotel).catch(() => ({
+          getHotelById(reservationData.idHotel).catch(() => ({
             nombre: `Hotel #${reservationData.idHotel} (Error)`,
           })),
           getRoomTypeById(reservationData.idTipoHabitacion).catch(() => ({
@@ -60,7 +54,6 @@ const ReservationDetails = () => {
           })),
         ]);
 
-        // Paso 3: Establecer los nombres en la metadata
         setMetadata({
           nombreUsuario: user.nombre || `Usuario #${reservationData.idUsuario}`,
           nombreHotel: hotel.nombre || `Hotel #${reservationData.idHotel}`,

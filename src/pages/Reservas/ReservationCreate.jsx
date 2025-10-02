@@ -3,21 +3,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createReservation } from "../../services/ReservationService";
-// Asumimos que tienes estos servicios listos para cargar los detalles por ID:
-import { getHotelDetail } from "../../services/hotelesService";
+import { getHotelById } from "../../services/HotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
-import { getUserById } from "../../services/UserService";
-// Asume que la ID del usuario logueado está disponible (e.g., de tu AuthContext o localStorage)
+import { getUserById } from "../../services/AdminService";
 
-// --- MOCK DATA / ASUNCIONES INICIALES ---
-// En una app real, estos IDs vendrían de los props, el AuthContext, o la URL.
 const MOCK_IDS = {
-  // Reemplaza esto con la forma real de obtener los IDs
-  idUsuario: "68d730b89af0145fd925b561", // ID del usuario logueado
-  idHotel: 1, // ID del hotel seleccionado
-  idTipoHabitacion: 1, // ID del tipo de habitación seleccionado
+  idUsuario: "68d730b89af0145fd925b561",
+  idHotel: 1,
+  idTipoHabitacion: 1,
 };
-// ----------------------------------------
 
 // Función para obtener la hora local en formato datetime-local (YYYY-MM-DDTHH:MM)
 const getLocalDatetime = (date = new Date()) => {
@@ -28,8 +22,6 @@ const getLocalDatetime = (date = new Date()) => {
 
 const ReservationCreate = () => {
   const navigate = useNavigate();
-  // const { idHotel, idRoomType } = useParams(); // Usar si vienen de la URL
-
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState(null);
   const [metadata, setMetadata] = useState({
@@ -39,26 +31,22 @@ const ReservationCreate = () => {
     precioPorNoche: 0,
   });
 
-  // 1. Inicializar el formulario
   const [form, setForm] = useState({
     idUsuario: MOCK_IDS.idUsuario,
     idHotel: MOCK_IDS.idHotel,
     idTipoHabitacion: MOCK_IDS.idTipoHabitacion,
-    fechaRealizado: getLocalDatetime(), // Se inicializa con la hora actual
+    fechaRealizado: getLocalDatetime(),
     fechaInicio: "",
     fechaFin: "",
     total: 0.0,
   });
   const [validationErrors, setValidationErrors] = useState({});
-
-  // 2. Carga inicial de datos (Metadata: Usuario, Hotel, Habitación)
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        // Aquí usamos los IDs mock, pero usarías los IDs reales de tu sistema
         const [user, hotel, roomType] = await Promise.all([
           getUserById(MOCK_IDS.idUsuario),
-          getHotelDetail(MOCK_IDS.idHotel),
+          getHotelById(MOCK_IDS.idHotel),
           getRoomTypeById(MOCK_IDS.idTipoHabitacion),
         ]);
 
@@ -80,7 +68,6 @@ const ReservationCreate = () => {
     fetchMetadata();
   }, []);
 
-  // 3. Cálculo del Total (Función que se ejecuta con el cambio de fechas)
   const calcularTotal = useCallback(() => {
     const { fechaInicio, fechaFin } = form;
     const precio = metadata.precioPorNoche;
@@ -90,7 +77,6 @@ const ReservationCreate = () => {
       const fin = new Date(fechaFin);
 
       if (fin > inicio && !isNaN(precio)) {
-        // Calcular la diferencia en días (redondeado hacia arriba)
         const diffTiempo = fin.getTime() - inicio.getTime();
         const diffDias = Math.ceil(diffTiempo / (1000 * 3600 * 24));
         const totalCalculado = diffDias * precio;
@@ -109,21 +95,17 @@ const ReservationCreate = () => {
     calcularTotal();
   }, [calcularTotal]);
 
-  // 4. Manejo de cambios en el formulario
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
-    // Limpiar errores de validación si el usuario corrige el campo
     setValidationErrors((prev) => ({ ...prev, [id]: undefined }));
   };
 
-  // 5. Manejo del Submit del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError(null);
     setValidationErrors({});
 
-    // Validación simple antes de enviar
     if (!form.fechaInicio || !form.fechaFin || form.total <= 0) {
       setValidationErrors({
         fechaInicio: !form.fechaInicio
@@ -138,13 +120,13 @@ const ReservationCreate = () => {
       return;
     }
 
+    const { fechaRealizado, ...dataToSend } = form;
+
     try {
-      await createReservation(form);
+      await createReservation(dataToSend);
       alert("Reserva creada con éxito!");
-      // Redirigir a la lista de reservas o al detalle de la nueva reserva
-      navigate(`/reservas`);
     } catch (error) {
-      setSubmitError(`Error al crear la reserva: ${error}`);
+      setSubmitError(`Error al crear la reserva: ${error.message || error}`);
     }
   };
 
@@ -153,7 +135,6 @@ const ReservationCreate = () => {
       <div className="text-center py-10">Cargando datos de la reserva...</div>
     );
 
-  // Preparar texto para fecha realizado (solo visualización)
   const fechaRealizadoTexto = new Date(form.fechaRealizado).toLocaleString(
     "es-ES",
     {
@@ -162,8 +143,7 @@ const ReservationCreate = () => {
     }
   );
 
-  const primaryColor = "green"; // Usar un color temático de Tailwind para el botón de 'Crear'
-
+  const primaryColor = "green";
   return (
     <div className="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-6 bg-white p-8 shadow-xl rounded-lg">
@@ -182,7 +162,6 @@ const ReservationCreate = () => {
         )}
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          {/* Usuario (Solo lectura) */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Usuario
@@ -197,15 +176,15 @@ const ReservationCreate = () => {
               value={form.idUsuario}
             />
           </div>
-
-          {/* Hotel (Solo lectura) */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Hotel
             </label>
+
             <span className="mt-1 block w-full border rounded-md p-2 bg-gray-100 text-gray-800">
               {metadata.hotel ? metadata.hotel.nombre : "No disponible"}
             </span>
+
             <input
               type="hidden"
               id="idHotel"
@@ -213,12 +192,11 @@ const ReservationCreate = () => {
               value={form.idHotel}
             />
           </div>
-
-          {/* Tipo de habitación (Solo lectura) */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Tipo de habitación
             </label>
+
             <span className="mt-1 block w-full border rounded-md p-2 bg-gray-100 text-gray-800">
               {metadata.tipoHabitacion
                 ? `${
@@ -233,15 +211,15 @@ const ReservationCreate = () => {
               value={form.idTipoHabitacion}
             />
           </div>
-
-          {/* Fecha realizado (Solo lectura) */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Fecha realizado
             </label>
+
             <span className="mt-1 block w-full border rounded-md p-2 bg-gray-100 text-gray-800">
               {fechaRealizadoTexto}
             </span>
+
             <input
               type="hidden"
               id="fechaRealizado"
@@ -249,8 +227,6 @@ const ReservationCreate = () => {
               value={form.fechaRealizado}
             />
           </div>
-
-          {/* Fecha inicio */}
           <div>
             <label
               htmlFor="fechaInicio"
@@ -263,7 +239,7 @@ const ReservationCreate = () => {
               id="fechaInicio"
               value={form.fechaInicio}
               onChange={handleChange}
-              min={getLocalDatetime()} // Opcional: Impedir fechas pasadas
+              min={getLocalDatetime()}
               className={`mt-1 block w-full border rounded-md p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
                 validationErrors.fechaInicio
                   ? "border-red-500"
@@ -276,8 +252,6 @@ const ReservationCreate = () => {
               </p>
             )}
           </div>
-
-          {/* Fecha fin */}
           <div>
             <label
               htmlFor="fechaFin"
@@ -290,7 +264,7 @@ const ReservationCreate = () => {
               id="fechaFin"
               value={form.fechaFin}
               onChange={handleChange}
-              min={form.fechaInicio || getLocalDatetime()} // Asegurar que sea posterior a la fecha inicio
+              min={form.fechaInicio || getLocalDatetime()}
               className={`mt-1 block w-full border rounded-md p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
                 validationErrors.fechaFin ? "border-red-500" : "border-gray-300"
               }`}
@@ -307,8 +281,6 @@ const ReservationCreate = () => {
                 </p>
               )}
           </div>
-
-          {/* Total (Solo lectura) */}
           <div>
             <label
               htmlFor="total"
@@ -326,27 +298,24 @@ const ReservationCreate = () => {
               className="mt-1 block w-full border rounded-md p-2 bg-gray-200 text-gray-800 font-bold"
             />
           </div>
-
-          {/* Botones */}
           <div className="flex flex-col sm:flex-row-reverse gap-4 pt-4">
             <button
               type="submit"
               className={`flex w-full justify-center rounded-full border border-transparent
-                                bg-${primaryColor}-600 py-3 px-4 text-sm font-bold text-white
-                                shadow-sm hover:bg-${primaryColor}-700 transition-colors focus:outline-none
-                                focus:ring-2 focus:ring-${primaryColor}-500 focus:ring-offset-2`}
+               bg-${primaryColor}-600 py-3 px-4 text-sm font-bold text-white
+                shadow-sm hover:bg-${primaryColor}-700 transition-colors focus:outline-none
+                focus:ring-2 focus:ring-${primaryColor}-500 focus:ring-offset-2`}
             >
               Crear
             </button>
-
             <button
               type="button"
               onClick={() =>
                 navigate(`/reservas/detallehotel/${MOCK_IDS.idHotel}`)
-              } // Asume ruta de detalle de hotel
+              }
               className="flex w-full justify-center rounded-full border border-gray-300
-                                bg-gray-100 text-slate-950 py-3 px-4 text-sm font-bold shadow-sm
-                                hover:bg-red-500 hover:text-white transition-colors focus:outline-none"
+                  bg-gray-100 text-slate-950 py-3 px-4 text-sm font-bold shadow-sm
+                  hover:bg-red-500 hover:text-white transition-colors focus:outline-none"
             >
               Cancelar
             </button>
