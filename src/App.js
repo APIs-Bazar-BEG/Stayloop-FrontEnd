@@ -44,7 +44,11 @@ import Register from "./pages/Login/Register.jsx";
 // Navbar
 import Navbar from "./components/Navbar.jsx";
 
+// ------------------ DEFINICIÓN DE ROLES ------------------
 const ADMIN_ROLE_ID = 1;
+// ⭐ CORREGIDO: SE ELIMINÓ EL 'const' REPETIDO AQUÍ
+const HOTEL_ROLE_ID = 2;
+// ---------------------------------------------------------
 
 function App() {
   function MainRouter() {
@@ -89,19 +93,19 @@ function App() {
       <>
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
-          <Route path="/" element={<Home />} />
+                    <Route path="/" element={<Home />} />
           <Route
             path="/login"
             element={<Login onLoginSuccess={handleLogin} />}
           />
-          <Route path="/register" element={<Register />} />
+                    <Route path="/register" element={<Register />} />
           <Route path="/reservas/hoteles" element={<HotelesPublicList />} />
           <Route path="/reservas/detallehotel/:id" element={<HotelDetails />} />
           <Route
             path="/reservas/create"
             element={
               <ProtectedRoute>
-                <ReservationForm />{" "}
+                <ReservationForm />
               </ProtectedRoute>
             }
           />
@@ -111,6 +115,26 @@ function App() {
               <ProtectedRoute>
                 <Perfil user={user} />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hoteles"
+            element={
+              <ProtectedRoute allowedRoleIds={[HOTEL_ROLE_ID]}>
+                <HotelesList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hotel/create"
+            element={
+              <ProtectedRoute allowedRoleIds={[HOTEL_ROLE_ID]}></ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hotel/edit/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[HOTEL_ROLE_ID]}></ProtectedRoute>
             }
           />
           <Route
@@ -224,7 +248,7 @@ function App() {
                 <ReservationCreate />
               </ProtectedRoute>
             }
-          />{" "}
+          />
           <Route
             path="/gestion/reservas/edit/:id"
             element={
@@ -256,7 +280,7 @@ function App() {
 
   return (
     <Router>
-      <MainRouter />
+            <MainRouter />
     </Router>
   );
 }

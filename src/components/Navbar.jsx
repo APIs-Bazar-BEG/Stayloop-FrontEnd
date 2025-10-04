@@ -1,26 +1,50 @@
-// src/components/Navbar.jsx
-
 import React from "react";
 import { Link } from "react-router-dom";
+// Asegúrate de que 'getFullImageUrl' esté correctamente importado desde tu servicio de usuario/auth
 import { getFullImageUrl } from "../services/stayloopService";
 
 const Navbar = ({ user, onLogout }) => {
+  // Definición de Roles (Asegúrate de que coincida con tu backend)
   const ADMIN_ROLE_ID = 1;
+  const HOTEL_ROLE_ID = 2;
+
+  // Verificaciones de Roles
   const isAdmin = user && user.idRol === ADMIN_ROLE_ID;
+  const isHotel = user && user.idRol === HOTEL_ROLE_ID;
+  const isLoggedIn = !!user;
 
   const userImageUrl =
-    user && user.imageUrl ? getFullImageUrl(user.imageUrl) : null; // Definición de enlaces de navegación
+    user && user.imageUrl ? getFullImageUrl(user.imageUrl) : null;
 
+  // Definición de enlaces de navegación centralizados y con lógica clara
   const navLinks = [
+    // Enlace de Hoteles Público (Solo visible para Clientes o no logueados)
     {
-      // 🌟 CORRECCIÓN CLAVE: La ruta pública de hoteles es /reservas/hoteles
       to: "/reservas/hoteles",
       label: "Hoteles",
-      requiresAuth: false, // Ahora es visible incluso si no están logueados
-      showIfAdmin: false,
-    }, // Mi Perfil es visible para todos los logueados
-    { to: "/perfil", label: "Mi Perfil", requiresAuth: true }, // Admin solo es visible para el Admin logueado
-    { to: "/admin", label: "Admin", requiresAuth: true, showIfAdmin: true },
+      // Visible si no es Admin ni Hotel
+      show: !isAdmin && !isHotel,
+    },
+    // Enlace de Gestión para Hoteles (Solo visible para Rol Hotel)
+    {
+      to: "/hoteles", // ⭐ RUTA ADMINISTRATIVA DE HOTELES (HotelesList.jsx)
+      label: "Mis Hoteles",
+      show: isHotel,
+      isSpecial: true,
+    },
+    // Enlace de Gestión para Admin (Solo visible para Rol Admin)
+    {
+      to: "/admin",
+      label: "Admin",
+      show: isAdmin,
+      isSpecial: true,
+    },
+    // Mi Perfil (Visible para todos los logueados)
+    {
+      to: "/perfil",
+      label: "Mi Perfil",
+      show: isLoggedIn,
+    },
   ];
 
   return (
@@ -28,37 +52,20 @@ const Navbar = ({ user, onLogout }) => {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-6">
           <div className="text-2xl font-bold text-blue-600">
+            {/* StayLoop actúa como enlace de inicio */}
             <Link to="/">StayLoop</Link>
           </div>
 
+          {/* Mapeo de Enlaces de Navegación */}
           {navLinks.map((link) => {
-            // Si no requiere autenticación O si el usuario está logueado
-            if (!link.requiresAuth || user) {
-              // Lógica para enlaces de Admin
-              if (link.showIfAdmin !== undefined) {
-                // Si es un enlace de Admin, solo lo ve el Admin
-                if (link.showIfAdmin === isAdmin) {
-                  return (
-                    <Link
-                      key={link.to}
-                      to={link.to}
-                      className={`text-gray-600 hover:text-blue-600 font-medium ${
-                        link.showIfAdmin && "font-bold"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                } else {
-                  return null;
-                }
-              }
-
+            if (link.show) {
               return (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="text-gray-600 hover:text-blue-600 font-medium"
+                  className={`text-gray-600 hover:text-blue-600 font-medium ${
+                    link.isSpecial && "font-bold" // Poner en negrita para Admin/Hotel
+                  }`}
                 >
                   {link.label}
                 </Link>
@@ -68,8 +75,9 @@ const Navbar = ({ user, onLogout }) => {
           })}
         </div>
 
+        {/* Botones de Login/Logout y Perfil */}
         <div className="flex items-center space-x-4">
-          {user ? (
+          {isLoggedIn ? (
             <>
               <img
                 src={

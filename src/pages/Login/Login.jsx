@@ -12,6 +12,7 @@ const Login = ({ onLoginSuccess }) => {
 
   // ID del rol de Administrador, basado en tu lógica de Navbar
   const ADMIN_ROLE_ID = 1;
+  const HOTEL_ROLE_ID = 2;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,14 +20,18 @@ const Login = ({ onLoginSuccess }) => {
     try {
       const response = await login(email, password);
       if (response && response.user) {
-        const user = response.user; // 1. Notificar al componente superior (App.js) para actualizar el estado global.
+        const user = response.user;
+        onLoginSuccess(user);
 
-        onLoginSuccess(user); // 2. Lógica de Redirección Condicional
-
+        // ⭐ Lógica de Redirección Condicional (ACTUALIZADA)
         if (user.idRol === ADMIN_ROLE_ID) {
           navigate("/admin"); // Redirigir al Administrador
-        } else {
-          navigate("/hoteles"); // Redirigir al Cliente a la lista de hoteles
+        } else if (user.idRol === HOTEL_ROLE_ID) {
+          navigate("/hoteles"); // Redirigir al Hotel a su vista de administración de hoteles
+        }
+        // Si no es ni Admin ni Hotel, se considera Cliente
+        else {
+          navigate("/reservas/hoteles"); // Redirigir al Cliente a la lista pública de hoteles
         }
       }
     } catch (err) {
