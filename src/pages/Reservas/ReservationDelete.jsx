@@ -88,7 +88,7 @@ const ReservationDelete = () => {
     try {
       await deleteReservation(id);
       alert(`Reserva #${id} eliminada con éxito.`);
-      navigate("/reservas"); // Redirigir a la lista de reservas
+      navigate("/gestion/reservas"); // Redirigir a la lista de reservas
     } catch (err) {
       setError(`Error al eliminar: ${err}`);
       setLoading(false);
@@ -159,7 +159,7 @@ const ReservationDelete = () => {
             <div className="flex justify-between gap-4">
               <button
                 type="button"
-                onClick={() => navigate("/reservas")}
+                onClick={() => navigate("/gestion/reservas")}
                 className="flex-1 bg-gray-400 text-white px-4 py-3 rounded-lg font-bold hover:bg-gray-500 transition-colors shadow"
               >
                 Cancelar

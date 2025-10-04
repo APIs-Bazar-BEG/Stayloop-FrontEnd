@@ -9,10 +9,15 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// Vistas principales
+// --------------------------- Vistas principales ---------------------------
 import Home from "./pages/Home.jsx";
 
-// Vistas Admin
+// --------------------------- Vistas Cliente ---------------------------
+import HotelesPublicList from "./pages/Reservas/HotelesPublicList.jsx";
+import HotelDetails from "./pages/Reservas/HotelDetails.jsx";
+import ReservationForm from "./pages/Reservas/ReservationForm.jsx";
+
+// --------------------------- Vistas Admin ---------------------------
 import AdminDashboard from "./pages/Gestion/AdminDashboard.jsx";
 import UserList from "./pages/Gestion/UserList.jsx";
 import UserCreate from "./pages/Gestion/UserCreate.jsx";
@@ -84,14 +89,22 @@ function App() {
       <>
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
-          <Route path="/" element={user ? <Home /> : <Home />} />
-
+          <Route path="/" element={<Home />} />
           <Route
             path="/login"
             element={<Login onLoginSuccess={handleLogin} />}
           />
           <Route path="/register" element={<Register />} />
-
+          <Route path="/reservas/hoteles" element={<HotelesPublicList />} />
+          <Route path="/reservas/detallehotel/:id" element={<HotelDetails />} />
+          <Route
+            path="/reservas/create"
+            element={
+              <ProtectedRoute>
+                <ReservationForm />{" "}
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/perfil"
             element={
@@ -100,7 +113,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/admin"
             element={
@@ -109,7 +121,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/gestion/usuarios"
             element={
@@ -118,7 +129,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/gestion/usuarios/crear"
             element={
@@ -127,7 +137,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/gestion/usuarios/editar/:id"
             element={
@@ -136,7 +145,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/gestion/usuarios/detalles/:id"
             element={
@@ -145,7 +153,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/gestion/usuarios/eliminar/:id"
             element={
@@ -154,7 +161,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/zonas"
             element={
@@ -163,7 +169,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/zonas/create"
             element={
@@ -172,7 +177,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/zonas/edit/:id"
             element={
@@ -181,7 +185,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/zonas/delete/:id"
             element={
@@ -190,7 +193,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/zonas/:id"
             element={
@@ -199,7 +201,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/gestion/hoteles"
             element={
@@ -208,7 +209,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/gestion/reservas"
             element={
@@ -217,45 +217,32 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
-            path="/reservas"
-            element={
-              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
-                <ReservasList />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/reservas/create"
+            path="/gestion/reservas/crear"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <ReservationCreate />
               </ProtectedRoute>
             }
-          />
-
+          />{" "}
           <Route
-            path="/reservas/edit/:id"
+            path="/gestion/reservas/edit/:id"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <ReservationEdit />
               </ProtectedRoute>
             }
           />
-
           <Route
-            path="/reservas/details/:id"
+            path="/gestion/reservas/details/:id"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <ReservationDetails />
               </ProtectedRoute>
             }
           />
-
           <Route
-            path="/reservas/delete/:id"
+            path="/gestion/reservas/delete/:id"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
                 <ReservationDelete />

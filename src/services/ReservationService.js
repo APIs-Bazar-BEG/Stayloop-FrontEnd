@@ -83,9 +83,8 @@ export const updateReservation = async (id, reservationData) => {
 
 export const deleteReservation = async (id) => {
   try {
-    const response = await api.post(
+    const response = await api.delete(
       `/reservations/delete/${id}`,
-      null,
       getAuthHeaders()
     );
     return response.data;

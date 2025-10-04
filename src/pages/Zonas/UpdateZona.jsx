@@ -1,7 +1,7 @@
 //Jira
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { updateZona, getZonaById } from "../../services/zonasService"; // requiere token
+import { updateZona, getZonaById } from "../../services/ZonasService"; // requiere token
 
 // Nombre del componente corregido a UpdateZona
 const UpdateZona = () => {

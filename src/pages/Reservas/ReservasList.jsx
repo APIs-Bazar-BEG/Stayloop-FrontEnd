@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getAllReservations } from "../../services/ReservationService";
-
 import { getUserById } from "../../services/AdminService";
 import { getHotelById } from "../../services/HotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
@@ -182,13 +181,6 @@ const ReservasList = () => {
           <h2 className="text-3xl font-bold text-gray-900">
             Listado de Reservas
           </h2>
-
-          <Link
-            to="/reservas/create"
-            className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md"
-          >
-            + Nueva Reserva
-          </Link>
         </div>
 
         <form
@@ -286,13 +278,11 @@ const ReservasList = () => {
                   <td className="py-2 px-4 border text-sm text-gray-700">
                     {reserva.nombreHotel}
                   </td>
-
                   <td className="py-2 px-4 border text-sm text-gray-700">
                     {reserva.nombreTipoHabitacion}
                   </td>
-
                   <td className="py-2 px-4 border text-sm text-gray-700">
-                    {formatDate(reserva.fechaInicio)}
+                    {formatDate(reserva.fechaInicio)}{" "}
                   </td>
 
                   <td className="py-2 px-4 border text-sm text-gray-700">
@@ -305,14 +295,14 @@ const ReservasList = () => {
 
                   <td className="py-2 px-4 border flex gap-2">
                     <Link
-                      to={`/reservas/details/${reserva.id}`}
+                      to={`/gestion/reservas/details/${reserva.id}`}
                       className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600 transition-colors"
                     >
                       Ver
                     </Link>
 
                     <Link
-                      to={`/reservas/delete/${reserva.id}`}
+                      to={`/gestion/reservas/delete/${reserva.id}`}
                       className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition-colors"
                     >
                       Eliminar
@@ -334,6 +324,7 @@ const ReservasList = () => {
             </tbody>
           </table>
         </div>
+
         {reservasData.totalPages > 1 && (
           <div className="mt-6 flex justify-center gap-2">
             {pageNumbers.map((pageNum) => (
@@ -341,11 +332,11 @@ const ReservasList = () => {
                 key={pageNum}
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-4 py-2 border rounded font-medium transition-colors 
-                 ${
-                   pageNum === currentPage
-                     ? "bg-blue-600 text-white border-blue-600"
-                     : "bg-white text-gray-700 hover:bg-gray-100"
-                 }`}
+                  ${
+                    pageNum === currentPage
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 hover:bg-gray-100"
+                  }`}
               >
                 {pageNum + 1}
               </button>

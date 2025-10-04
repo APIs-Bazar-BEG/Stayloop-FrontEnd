@@ -1,7 +1,7 @@
 //Jira
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { deleteZona, getZonaById } from "../../services/zonasService"; // requiere token
+import { deleteZona, getZonaById } from "../../services/ZonasService"; // requiere token
 
 // Nombre del componente corregido a DeleteZona
 const DeleteZona = () => {

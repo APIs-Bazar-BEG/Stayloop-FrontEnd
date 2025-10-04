@@ -1,8 +1,7 @@
 //Jira
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { getZonas } from '../../services/zonasService'; 
-
+import { getZonas } from "../../services/ZonasService";
 
 const ZonasList = () => {
   const [zonas, setZonas] = useState([]);
@@ -12,20 +11,25 @@ const ZonasList = () => {
   const [page, setPage] = useState(parseInt(searchParams.get("page")) || 1);
 
   // Fetch zonas desde API
-useEffect(() => {
-  const fetchZonas = async () => {
-    try {
-      const allZonas = await getZonas(); // llama a la API real
-      setZonas(allZonas || []); // si tu API devuelve un array
-      // Si la API devuelve paginado con totalPages, ajusta pageNumbers
-      setPageNumbers(Array.from({ length: Math.ceil(allZonas.length / 10) }, (_, i) => i + 1));
-    } catch (err) {
-      console.error("Error cargando zonas:", err);
-    }
-  };
+  useEffect(() => {
+    const fetchZonas = async () => {
+      try {
+        const allZonas = await getZonas(); // llama a la API real
+        setZonas(allZonas || []); // si tu API devuelve un array
+        // Si la API devuelve paginado con totalPages, ajusta pageNumbers
+        setPageNumbers(
+          Array.from(
+            { length: Math.ceil(allZonas.length / 10) },
+            (_, i) => i + 1
+          )
+        );
+      } catch (err) {
+        console.error("Error cargando zonas:", err);
+      }
+    };
 
-  fetchZonas();
-}, [page, nombre]);
+    fetchZonas();
+  }, [page, nombre]);
 
   // Manejar búsqueda
   const handleSearch = (e) => {
@@ -53,9 +57,7 @@ useEffect(() => {
           onSubmit={handleSearch}
           className="flex w-full items-center rounded-full bg-white shadow-lg border border-gray-100 h-14 mb-8"
         >
-          <div className="pl-6 pr-3 text-gray-500">
-            🔍
-          </div>
+          <div className="pl-6 pr-3 text-gray-500">🔍</div>
           <input
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
@@ -85,18 +87,30 @@ useEffect(() => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600">Nombre</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600">Descripción</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600">Hoteles</th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600">Acciones</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600">
+                  ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600">
+                  Nombre
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600">
+                  Descripción
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600">
+                  Hoteles
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {zonas.length > 0 ? (
                 zonas.map((zona) => (
                   <tr key={zona.id}>
-                    <td className="px-6 py-4 text-sm text-gray-700">{zona.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {zona.id}
+                    </td>
                     <td className="px-6 py-4 text-sm font-bold text-gray-800">
                       {zona.nombre}
                     </td>

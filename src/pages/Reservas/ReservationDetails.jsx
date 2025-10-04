@@ -145,17 +145,11 @@ const ReservationDetails = () => {
 
           <div className="mt-8 flex justify-between gap-4">
             <button
-              onClick={() => navigate("/reservas")}
+              onClick={() => navigate("/gestion/reservas")}
               className="flex-1 bg-gray-400 text-white px-4 py-3 rounded-lg font-bold hover:bg-gray-500 transition-colors shadow"
             >
               Volver
             </button>
-            <Link
-              to={`/reservas/edit/${reserva.id}`}
-              className="flex-1 text-center bg-blue-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow"
-            >
-              Editar
-            </Link>
           </div>
         </div>
       </div>
