@@ -1,9 +1,9 @@
 // src/pages/Reservas/HotelDetails.jsx
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getHotelById } from "../../services/HotelesService";
+import { getHotelById } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
-import { getZonas } from "../../services/ZonasService";
+import { getZonas } from "../../services/zonasService";
 const MOCK_IMAGES = [
   // Reemplazar con la función de servicio real de imágenes
   { id: 1, url: "...", isExtra: false },

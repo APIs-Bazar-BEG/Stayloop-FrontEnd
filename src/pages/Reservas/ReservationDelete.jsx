@@ -7,7 +7,7 @@ import {
   deleteReservation,
 } from "../../services/ReservationService";
 // Asumimos que estos servicios están disponibles para resolver los nombres:
-import { getHotelById } from "../../services/HotelesService";
+import { getHotelById } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
 import { getUserById } from "../../services/AdminService";
 

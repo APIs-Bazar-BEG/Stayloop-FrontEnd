@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getAllReservations } from "../../services/ReservationService";
 import { getUserById } from "../../services/AdminService";
-import { getHotelById } from "../../services/HotelesService";
+import { getHotelById } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
 
 const formatDate = (dateString) => {

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { createReservation } from "../../services/ReservationService"; // Asumimos esta función existe
-import { getHotelById } from "../../services/HotelesService";
+import { getHotelById } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService"; // Asumimos esta función existe
 
 // MOCK de usuario logueado. En una app real, vendría de un Context/Store.

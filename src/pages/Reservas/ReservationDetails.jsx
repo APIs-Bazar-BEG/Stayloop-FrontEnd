@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getReservationById } from "../../services/ReservationService";
-import { getHotelById } from "../../services/HotelesService";
+import { getHotelById } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
 import { getUserById } from "../../services/AdminService";
 

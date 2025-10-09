@@ -1,7 +1,7 @@
 //Jira
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { getZonas } from "../../services/ZonasService";
+import { getZonas } from "../../services/zonasService";
 
 const ZonasList = () => {
   const [zonas, setZonas] = useState([]);

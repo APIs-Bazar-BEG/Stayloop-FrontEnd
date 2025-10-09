@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaPlus, FaPencilAlt, FaTrash } from "react-icons/fa";
-import { getHoteles, deleteHotel } from "../../services/HotelesService";
+import { getHoteles, deleteHotel } from "../../services/hotelesService";
 import { getImagesByHotelId, getImageUrl } from "../../services/ImageService";
 
 // Definición de colores base (simulando tus variables CSS)

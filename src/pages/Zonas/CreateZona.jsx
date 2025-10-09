@@ -7,7 +7,7 @@ import {
   createZona,
   updateZona,
   getZonaById,
-} from "../../services/ZonasService";
+} from "../../services/zonasService";
 
 // Definición de la estructura de la Zona
 const initialZonaState = {

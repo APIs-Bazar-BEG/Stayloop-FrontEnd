@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getHoteles } from "../../services/HotelesService";
+import { getHoteles } from "../../services/hotelesService";
 // ⭐ Importar el servicio de imágenes
 import { getImagesByHotelId, getImageUrl } from "../../services/ImageService";
 

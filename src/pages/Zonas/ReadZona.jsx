@@ -1,7 +1,7 @@
 //Jira
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { getZonaById } from "../../services/ZonasService";
+import { getZonaById } from "../../services/zonasService";
 
 // Nombre del componente corregido a ReadZona (Leer)
 const ReadZona = () => {

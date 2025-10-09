@@ -6,7 +6,7 @@ import {
   getReservationById,
   updateReservation,
 } from "../../services/ReservationService";
-import { getHotelById } from "../../services/HotelesService";
+import { getHotelById } from "../../services/hotelesService";
 import { getRoomTypeById } from "../../services/RoomTypeService";
 import { getUserById } from "../../services/AdminService";
 
