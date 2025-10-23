@@ -4,16 +4,34 @@
 import { getAuthHeaders } from "./axios";
 import axios from "axios";
 
-const API_BASE_URL = "https://stayloop-api.onrender.com";
+// En services/ImageService.js - Forzar CORS
+// En services/ImageService.js - Cambia las URLs
+const API_BASE_URL = ""; // Vacío para usar el proxy
 const IMAGES_ENDPOINT = "/images";
 const API_URL = `${API_BASE_URL}${IMAGES_ENDPOINT}`;
 
-// ... el resto de las funciones sigue igual ...
-/**
- * Obtiene la lista de IDs de imágenes asociadas a un hotel.
- * @param {number} hotelId - El ID del hotel.
- * @returns {Promise<Array<Object>>} Un array de objetos de imagen (ej: [{id: 1, idHotel: 1}]).
- */
+export const uploadImage = async (hotelId, imageFile) => {
+  try {
+    const formData = new FormData();
+    formData.append("imagen", imageFile);
+    
+    const response = await axios.post(`${API_URL}/upload/${hotelId}`, formData, {
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al subir la imagen:", error);
+    throw new Error(error.response?.data?.message || "Error al subir la imagen.");
+  }
+};
+
+export const getImageUrl = (imageId) => {
+  return `https://stayloop-api.onrender.com/images/getbyid/${imageId}`;
+};
+
 export const getImagesByHotelId = async (hotelId) => {
   try {
     const response = await fetch(`${API_URL}/getbyhotelid/${hotelId}`);
@@ -28,46 +46,6 @@ export const getImagesByHotelId = async (hotelId) => {
   }
 };
 
-/**
- * Función auxiliar para construir la URL pública de la imagen.
- * @param {number} imageId - El ID de la imagen.
- * @returns {string} La URL completa de la imagen.
- */
-export const getImageUrl = (imageId) => {
-  return `${API_URL}/getbyid/${imageId}`;
-};
-
-// --- CREATE (Nueva función usando Axios y FormData) ---
-
-/**
- * Sube un archivo de imagen a un hotel.
- * POST https://stayloop-api.onrender.com/images/upload/1
- * @param {number} hotelId - ID del hotel.
- * @param {File} imageFile - El objeto File de la imagen.
- */
-export const uploadImage = async (hotelId, imageFile) => {
-  try {
-    const formData = new FormData(); // Asegúrate de que el nombre del campo ("image") coincida con lo que tu Multer/backend espera
-    formData.append("image", imageFile);
-    const response = await axios.post(
-      `${API_URL}/upload/${hotelId}`,
-      formData,
-      {
-        // Usamos getAuthHeaders para incluir el token
-        headers: getAuthHeaders(),
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Error al subir la imagen:",
-      error.response?.data || error.message
-    );
-    throw new Error(
-      error.response?.data?.message || "Error al subir la imagen."
-    );
-  }
-};
 
 // --- DELETE (Nueva función usando Axios) ---
 

@@ -35,6 +35,8 @@ import ReservationCreate from "./pages/Reservas/ReservationCreate.jsx";
 import ReservationEdit from "./pages/Reservas/ReservationEdit.jsx";
 import ReservationDetails from "./pages/Reservas/ReservationDetails.jsx";
 import ReservationDelete from "./pages/Reservas/ReservationDelete.jsx";
+import CreateHotel from "./pages/Hoteles/CreateHotel.jsx";
+import EditHotel from "./pages/Hoteles/EditHotel.jsx";
 
 // Login y Perfil
 import Login from "./pages/Login/Login.jsx";
@@ -46,7 +48,6 @@ import Navbar from "./components/Navbar.jsx";
 
 // ------------------ DEFINICIÓN DE ROLES ------------------
 const ADMIN_ROLE_ID = 1;
-// ⭐ CORREGIDO: SE ELIMINÓ EL 'const' REPETIDO AQUÍ
 const HOTEL_ROLE_ID = 2;
 // ---------------------------------------------------------
 
@@ -93,12 +94,12 @@ function App() {
       <>
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
-                    <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route
             path="/login"
             element={<Login onLoginSuccess={handleLogin} />}
           />
-                    <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/reservas/hoteles" element={<HotelesPublicList />} />
           <Route path="/reservas/detallehotel/:id" element={<HotelDetails />} />
           <Route
@@ -234,6 +235,22 @@ function App() {
             }
           />
           <Route
+            path="/gestion/hoteles/crear"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <CreateHotel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gestion/hoteles/editar/:id"
+            element={
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+                <EditHotel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/gestion/reservas"
             element={
               <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
@@ -280,7 +297,7 @@ function App() {
 
   return (
     <Router>
-            <MainRouter />
+           <MainRouter />
     </Router>
   );
 }

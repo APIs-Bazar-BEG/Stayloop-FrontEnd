@@ -1,3 +1,4 @@
+// src/services/hotelesService.js
 import axios from "axios";
 
 const api = axios.create({
@@ -42,9 +43,10 @@ export const createHotel = async (hotelData) => {
     const response = await api.post("/hotels/create", hotelData, {
       headers: getAuthHeaders(),
     });
+    console.log("Respuesta de createHotel:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error al crear hotel:", error.response || error);
+    console.error("Error en createHotel:", error.response || error);
     throw new Error(error.response?.data?.message || "Error al crear el hotel");
   }
 };

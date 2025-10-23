@@ -1,3 +1,4 @@
+// src/services/stayloopService.js
 import axios from "axios";
 
 // URL base de la API, usada SÓLO para construir URLs de imágenes externas.

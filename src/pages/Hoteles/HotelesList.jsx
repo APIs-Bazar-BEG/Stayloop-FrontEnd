@@ -4,58 +4,43 @@ import { FaPlus, FaPencilAlt, FaTrash } from "react-icons/fa";
 import { getHoteles, deleteHotel } from "../../services/hotelesService";
 import { getImagesByHotelId, getImageUrl } from "../../services/ImageService";
 
-// Definición de colores base (simulando tus variables CSS)
-const COLORS = {
-  "primary-color": "bg-green-500",
-  "secondary-color": "bg-gray-100",
-  "text-primary": "text-gray-800",
-  "text-secondary": "text-gray-600",
-  "border-color": "border-gray-200",
-};
-
 const HotelesList = () => {
   const [hoteles, setHoteles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hotelImages, setHotelImages] = useState({});
 
-  // ----------------------------------------------------------------------
-  // Carga de Datos
-  // ----------------------------------------------------------------------
   const loadHotelesAndImages = async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await getHoteles();
 
-      if (Array.isArray(data)) {
-        setHoteles(data);
-
-        // Cargar la portada (primera imagen) de cada hotel
-        const imagePromises = data.map(async (hotel) => {
-          const images = await getImagesByHotelId(hotel.id);
-          let imageUrl = "/placeholder_hotel.jpg"; // URL por defecto
-
-          // ⭐ Reemplazamos la ruta de Thymeleaf por la URL de la API:
-          if (images.length > 0) {
-            imageUrl = getImageUrl(images[0].id);
-          }
-
-          return { hotelId: hotel.id, url: imageUrl };
-        });
-
-        const results = await Promise.all(imagePromises);
-
-        const imagesMap = results.reduce((acc, result) => {
-          acc[result.hotelId] = result.url;
-          return acc;
-        }, {});
-
-        setHotelImages(imagesMap);
-      } else {
-        setHoteles([]);
-        setError("Formato de datos incorrecto o lista vacía.");
+      if (!Array.isArray(data)) {
+        throw new Error("Formato de datos incorrecto");
       }
+
+      setHoteles(data);
+
+      // Cargar imágenes en paralelo para mejor performance
+      const imagesMap = {};
+const imagePromises = data.map(async (hotel) => {
+  try {
+    const images = await getImagesByHotelId(hotel.id);
+    if (images.length > 0) {
+      imagesMap[hotel.id] = getImageUrl(images[0].id);
+    } else {
+      imagesMap[hotel.id] = "/placeholder_hotel.jpg";
+    }
+  } catch (err) {
+    console.warn(`No se pudieron cargar imágenes para hotel ${hotel.id}:`, err);
+    imagesMap[hotel.id] = "/placeholder_hotel.jpg";
+  }
+});
+
+      await Promise.all(imagePromises);
+      setHotelImages(imagesMap);
+
     } catch (err) {
       console.error("Error al cargar hoteles:", err);
       setError(err.message || "Fallo al cargar la lista de hoteles.");
@@ -69,132 +54,89 @@ const HotelesList = () => {
     loadHotelesAndImages();
   }, []);
 
-  // ----------------------------------------------------------------------
-  // Manejo de Acciones
-  // ----------------------------------------------------------------------
   const handleDelete = async (hotelId, hotelNombre) => {
-    if (
-      window.confirm(
-        `¿Estás seguro de que quieres eliminar el hotel "${hotelNombre}"? Esta acción es irreversible.`
-      )
-    ) {
-      try {
-        await deleteHotel(hotelId);
-        alert(`Hotel "${hotelNombre}" eliminado con éxito.`);
-        loadHotelesAndImages(); // Recargar la lista
-      } catch (err) {
-        console.error("Error al eliminar hotel:", err);
-        alert(
-          `Error al eliminar el hotel: ${err.message || "Error desconocido"}`
-        );
-      }
+    if (!window.confirm(`¿Estás seguro de eliminar "${hotelNombre}"?`)) return;
+    
+    try {
+      await deleteHotel(hotelId);
+      alert(`Hotel "${hotelNombre}" eliminado con éxito.`);
+      loadHotelesAndImages();
+    } catch (err) {
+      alert(`Error: ${err.message}`);
     }
   };
 
-  if (loading) {
-    return (
-      <p className="text-center text-blue-600 font-medium py-10">
-        Cargando hoteles...
-      </p>
-    );
-  }
+  if (loading) return <div className="text-center py-10">Cargando hoteles...</div>;
+  if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
 
-  if (error) {
-    return (
-      <p className="text-center text-red-500 font-medium py-10">{error}</p>
-    );
-  }
-
-  // ----------------------------------------------------------------------
-  // Renderizado del Componente
-  // ----------------------------------------------------------------------
   return (
-    <div className="flex-1 px-10 sm:px-20 md:px-40 py-8">
-      <div className="layout-content-container flex flex-col max-w-5xl mx-auto">
-        {/* Botón de Agregar Nuevo Hotel */}
-        <div className="mb-6 self-end">
+    <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header con botón */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Hoteles</h1>
           <Link
-            to="/hotel/create" // ⭐ Usa la ruta de creación
-            className={`flex items-center justify-center gap-2 h-10 px-5 ${COLORS["primary-color"]} text-white rounded-full text-sm font-bold tracking-wide hover:bg-green-600 transition-colors shadow-lg`}
+            to="/gestion/hoteles/crear"
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
           >
             <FaPlus size={16} />
-            <span className="truncate">Agregar Nuevo Hotel</span>
+            <span>Agregar Hotel</span>
           </Link>
         </div>
 
-        {/* Contenedor de la Lista */}
-        <div
-          className={`bg-white rounded-xl border ${COLORS["border-color"]} overflow-hidden shadow-lg`}
-        >
+        {/* Lista de hoteles */}
+        <div className="bg-white rounded-lg shadow-md border border-gray-200">
           {hoteles.length === 0 ? (
-            <p className="p-6 text-center text-gray-500">
+            <div className="p-6 text-center text-gray-500">
               No hay hoteles registrados.
-            </p>
+            </div>
           ) : (
-            hoteles.map((item) => (
+            hoteles.map((hotel) => (
               <div
-                key={item.id}
-                className="flex justify-between items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 property-item"
+                key={hotel.id}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
               >
-                {/* Información del Hotel */}
-                <div className="flex items-center gap-4">
-                  <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 overflow-hidden">
-                    <img
-                      src={hotelImages[item.id] || "/placeholder_hotel.jpg"}
-                      alt={`Portada de ${item.nombre}`}
-                      className="w-full h-full object-cover"
-                      // Fallback de imagen en caso de error de carga
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/placeholder_hotel.jpg";
-                      }}
-                    />
-                  </div>
-                  <div className="flex flex-col justify-center">
-                    {/* Usando tus colores simulados */}
-                    <p
-                      className={`${COLORS["text-secondary"]} text-lg font-semibold line-clamp-1`}
-                    >
-                      {item.nombre}
-                    </p>
-                    <p
-                      className={`${COLORS["text-primary"]} text-sm line-clamp-2`}
-                    >
-                      {item.direccion}
+                {/* Info del hotel */}
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <img
+                    src={hotelImages[hotel.id] || "/placeholder_hotel.jpg"}
+                    alt={`Portada de ${hotel.nombre}`}
+                    className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                    onError={(e) => {
+                      e.target.src = "/placeholder_hotel.jpg";
+                    }}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800 truncate">
+                      {hotel.nombre}
+                    </h3>
+                    <p className="text-gray-600 text-sm truncate">
+                      {hotel.direccion}
                     </p>
                   </div>
                 </div>
 
-                {/* Controles de Acción (Editar/Eliminar) */}
-                <div className="shrink-0 flex gap-2">
+                {/* Acciones */}
+                <div className="flex gap-2 flex-shrink-0">
                   <Link
-                    to={`/hotel/edit/${item.id}`} // ⭐ Usa la ruta de edición
-                    className={`flex items-center justify-center rounded-full h-9 px-4 text-white text-sm font-medium ${COLORS["primary-color"]} hover:bg-green-600 transition-colors w-fit`}
+                    to={`/gestion/hoteles/editar/${hotel.id}`}
+                    className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm transition-colors"
                   >
-                    <FaPencilAlt size={12} className="mr-2" />
-                    <span className="truncate">Editar</span>
+                    <FaPencilAlt size={12} />
+                    <span>Editar</span>
                   </Link>
                   <button
-                    onClick={() => handleDelete(item.id, item.nombre)}
-                    className="flex items-center justify-center rounded-full h-9 px-4 text-white text-sm font-medium bg-red-500 hover:bg-red-600 transition-colors w-fit"
+                    onClick={() => handleDelete(hotel.id, hotel.nombre)}
+                    className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm transition-colors"
                   >
-                    <FaTrash size={12} className="mr-2" />
-                    <span className="truncate">Eliminar</span>
+                    <FaTrash size={12} />
+                    <span>Eliminar</span>
                   </button>
                 </div>
               </div>
             ))
           )}
         </div>
-
-        {/* Si necesitas la paginación, la implementaríamos aquí */}
-        {/*
-                <div className="mt-4 flex justify-center gap-2">
-                    <a className="px-3 py-1 border rounded hover:bg-gray-200">1</a>
-                    <a className="px-3 py-1 border rounded hover:bg-gray-200">2</a>
-                    ...
-                </div>
-                */}
       </div>
     </div>
   );
