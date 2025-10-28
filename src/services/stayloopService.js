@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // URL base de la API, usada SÓLO para construir URLs de imágenes externas.
-const API_BASE_URL = "https://stayloop-api.onrender.com";
+const API_BASE_URL = "http://192.168.82.61:9090";
 
 // Instancia de Axios que utiliza el proxy de desarrollo (baseURL: "/")
 const api = axios.create({

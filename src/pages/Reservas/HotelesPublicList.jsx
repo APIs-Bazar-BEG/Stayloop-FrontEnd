@@ -1,52 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getHoteles } from "../../services/hotelesService";
-// ⭐ Importar el servicio de imágenes
-import { getImagesByHotelId, getImageUrl } from "../../services/ImageService";
 
 const HotelesPublicList = () => {
   const [hoteles, setHoteles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // ⭐ Nuevo estado: Mapa para almacenar la URL de portada de cada hotel
-  const [hotelImages, setHotelImages] = useState({}); // 1. Cargar Hoteles y sus Portadas
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadHotelesAndImages = async () => {
+    const loadHoteles = async () => {
       setLoading(true);
       setError(null);
       try {
-        // 1. Obtener la lista de hoteles
         const data = await getHoteles();
         if (Array.isArray(data)) {
-          setHoteles(data); // 2. Obtener la primera imagen de cada hotel de forma concurrente
-
-          const imagePromises = data.map(async (hotel) => {
-            // Obtener la lista de IDs de imágenes para este hotel
-            const images = await getImagesByHotelId(hotel.id);
-            let imageUrl = "/placeholder_hotel.jpg"; // Fallback URL por defecto
-            if (images.length > 0) {
-              // Usar el ID de la primera imagen para obtener su URL real
-              imageUrl = getImageUrl(images[0].id);
-            }
-            return {
-              hotelId: hotel.id,
-              url: imageUrl,
-            };
-          }); // Esperar a que todas las promesas de imagen se resuelvan
-
-          const results = await Promise.all(imagePromises); // Crear el mapa { id: url }
-          const imagesMap = results.reduce((acc, result) => {
-            acc[result.hotelId] = result.url;
-            return acc;
-          }, {});
-
-          setHotelImages(imagesMap);
+          setHoteles(data);
         } else {
           console.error("Respuesta de API inesperada. No es un array:", data);
           setHoteles([]);
-          setError(
-            "Fallo al cargar la lista de hoteles: Formato de datos incorrecto."
-          );
+          setError("Fallo al cargar la lista de hoteles: Formato de datos incorrecto.");
         }
       } catch (err) {
         console.error("Error al cargar hoteles:", err);
@@ -56,8 +28,9 @@ const HotelesPublicList = () => {
         setLoading(false);
       }
     };
-    loadHotelesAndImages();
+    loadHoteles();
   }, []);
+
   return (
     <div className="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
       <main className="container mx-auto px-6 py-8 flex-grow max-w-6xl">
@@ -85,15 +58,13 @@ const HotelesPublicList = () => {
                   key={item.id}
                   className="w-full max-w-xs bg-white rounded-lg shadow-xl overflow-hidden group transform hover:-translate-y-1 transition-transform duration-300"
                 >
-                  <img
-                    className="w-full h-48 object-cover"
-                    src={hotelImages[item.id] || "/placeholder_hotel.jpg"}
-                    alt={`Portada del hotel ${item.nombre}`}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/placeholder_hotel.jpg";
-                    }}
-                  />
+                  {/* Placeholder de imagen deshabilitado */}
+                  <div className="w-full h-48 bg-gray-100 flex flex-col items-center justify-center border-b">
+                    <div className="text-4xl mb-2">🏨</div>
+                    <p className="text-gray-500 text-sm text-center px-4">
+                      Imagen deshabilitada en modo de prueba
+                    </p>
+                  </div>
                   <div className="p-4">
                     <h3 className="text-xl font-bold text-gray-800 truncate">
                       {item.nombre}

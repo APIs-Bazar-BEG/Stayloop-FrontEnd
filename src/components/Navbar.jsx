@@ -79,14 +79,9 @@ const Navbar = ({ user, onLogout }) => {
         <div className="flex items-center space-x-4">
           {isLoggedIn ? (
             <>
-              <img
-                src={
-                  userImageUrl ||
-                  "https://via.placeholder.com/40/cccccc/ffffff?text=U"
-                }
-                alt="Perfil"
-                className="h-10 w-10 rounded-full object-cover"
-              />
+             <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300">
+                <span className="text-xl">👤</span>
+              </div>
 
               <span className="text-gray-700 font-medium hidden sm:block">
                 {user.nombre}

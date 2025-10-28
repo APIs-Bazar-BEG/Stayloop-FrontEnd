@@ -126,18 +126,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/hotel/create"
-            element={
-              <ProtectedRoute allowedRoleIds={[HOTEL_ROLE_ID]}></ProtectedRoute>
-            }
-          />
-          <Route
-            path="/hotel/edit/:id"
-            element={
-              <ProtectedRoute allowedRoleIds={[HOTEL_ROLE_ID]}></ProtectedRoute>
-            }
-          />
+
           <Route
             path="/admin"
             element={
@@ -229,7 +218,7 @@ function App() {
           <Route
             path="/gestion/hoteles"
             element={
-              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID, HOTEL_ROLE_ID]}>
                 <HotelesList />
               </ProtectedRoute>
             }
@@ -237,7 +226,7 @@ function App() {
           <Route
             path="/gestion/hoteles/crear"
             element={
-              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID, HOTEL_ROLE_ID]}>
                 <CreateHotel />
               </ProtectedRoute>
             }
@@ -245,7 +234,7 @@ function App() {
           <Route
             path="/gestion/hoteles/editar/:id"
             element={
-              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID]}>
+              <ProtectedRoute allowedRoleIds={[ADMIN_ROLE_ID, HOTEL_ROLE_ID]}>
                 <EditHotel />
               </ProtectedRoute>
             }

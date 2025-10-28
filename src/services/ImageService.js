@@ -29,7 +29,7 @@ export const uploadImage = async (hotelId, imageFile) => {
 };
 
 export const getImageUrl = (imageId) => {
-  return `https://stayloop-api.onrender.com/images/getbyid/${imageId}`;
+  return `http://192.168.82.61:9090/images/getbyid/${imageId}`;
 };
 
 export const getImagesByHotelId = async (hotelId) => {

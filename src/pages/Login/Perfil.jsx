@@ -46,11 +46,10 @@ const Perfil = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             <div className="md:col-span-1 flex justify-center md:justify-start">
               <div className="w-56 h-56 md:w-48 md:h-48 rounded-lg overflow-hidden shadow-xl ring-2 ring-gray-200">
-                <img
-                  src={userImageUrl}
-                  alt="Foto de Perfil"
-                  className="w-full h-full object-cover"
-                />
+                 <div className="text-6xl mb-2 text-center">👤</div>
+                <p className="text-gray-500 text-sm text-center px-4">
+                  Avatar deshabilitado en modo de prueba
+                </p>
               </div>
             </div>
 

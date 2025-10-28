@@ -2,15 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaPlus, FaPencilAlt, FaTrash } from "react-icons/fa";
 import { getHoteles, deleteHotel } from "../../services/hotelesService";
-import { getImagesByHotelId, getImageUrl } from "../../services/ImageService";
 
 const HotelesList = () => {
   const [hoteles, setHoteles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [hotelImages, setHotelImages] = useState({});
 
-  const loadHotelesAndImages = async () => {
+  const loadHoteles = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -22,25 +20,6 @@ const HotelesList = () => {
 
       setHoteles(data);
 
-      // Cargar imágenes en paralelo para mejor performance
-      const imagesMap = {};
-const imagePromises = data.map(async (hotel) => {
-  try {
-    const images = await getImagesByHotelId(hotel.id);
-    if (images.length > 0) {
-      imagesMap[hotel.id] = getImageUrl(images[0].id);
-    } else {
-      imagesMap[hotel.id] = "/placeholder_hotel.jpg";
-    }
-  } catch (err) {
-    console.warn(`No se pudieron cargar imágenes para hotel ${hotel.id}:`, err);
-    imagesMap[hotel.id] = "/placeholder_hotel.jpg";
-  }
-});
-
-      await Promise.all(imagePromises);
-      setHotelImages(imagesMap);
-
     } catch (err) {
       console.error("Error al cargar hoteles:", err);
       setError(err.message || "Fallo al cargar la lista de hoteles.");
@@ -51,7 +30,7 @@ const imagePromises = data.map(async (hotel) => {
   };
 
   useEffect(() => {
-    loadHotelesAndImages();
+    loadHoteles();
   }, []);
 
   const handleDelete = async (hotelId, hotelNombre) => {
@@ -60,7 +39,7 @@ const imagePromises = data.map(async (hotel) => {
     try {
       await deleteHotel(hotelId);
       alert(`Hotel "${hotelNombre}" eliminado con éxito.`);
-      loadHotelesAndImages();
+      loadHoteles();
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
@@ -72,7 +51,6 @@ const imagePromises = data.map(async (hotel) => {
   return (
     <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header con botón */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Hoteles</h1>
           <Link
@@ -84,7 +62,6 @@ const imagePromises = data.map(async (hotel) => {
           </Link>
         </div>
 
-        {/* Lista de hoteles */}
         <div className="bg-white rounded-lg shadow-md border border-gray-200">
           {hoteles.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
@@ -96,16 +73,10 @@ const imagePromises = data.map(async (hotel) => {
                 key={hotel.id}
                 className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
               >
-                {/* Info del hotel */}
                 <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <img
-                    src={hotelImages[hotel.id] || "/placeholder_hotel.jpg"}
-                    alt={`Portada de ${hotel.nombre}`}
-                    className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                    onError={(e) => {
-                      e.target.src = "/placeholder_hotel.jpg";
-                    }}
-                  />
+                  <div className="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
+                    <span className="text-gray-500 text-2xl">🏨</span>
+                  </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="text-lg font-semibold text-gray-800 truncate">
                       {hotel.nombre}
@@ -116,7 +87,6 @@ const imagePromises = data.map(async (hotel) => {
                   </div>
                 </div>
 
-                {/* Acciones */}
                 <div className="flex gap-2 flex-shrink-0">
                   <Link
                     to={`/gestion/hoteles/editar/${hotel.id}`}
